@@ -1,0 +1,22 @@
+doctype html
+html(lang="es")
+  
+  head
+    title PROYECTO WEB 2
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet" href="/css/styles.css")
+    block head 
+  body
+    header
+      nav
+        ul
+          li: a(href="/") Inicio
+          li: a(href="/pacientes") Pacientes
+          li: a(href="/contacto") Contacto
+    main
+      block content 
+    footer
+      p © 2025 - PROYECTO WEB 2
+      script(src="/js/scripts.js") 
+      block scripts 
