@@ -1,0 +1,34 @@
+extends ../layout.pug
+
+block content
+  h1 Agregar Nuevo Paciente
+  form(action="/pacientes/nuevo" method="POST")
+    div
+      label(for="dni") DNI:
+      input(type="text" name="dni" id="dni" required)
+    div
+      label(for="nombre") Nombre:
+      input(type="text" name="nombre" id="nombre" required)
+    div
+      label(for="apellido") Apellido:
+      input(type="text" name="apellido" id="apellido" required)
+    div
+      label(for="genero") Género:
+      select(name="genero" id="genero" required)
+        option(value="M") Masculino
+        option(value="F") Femenino
+        option(value="O") Otro
+    div
+      label(for="direccion") Dirección:
+      input(type="text" name="direccion" id="direccion")
+    div
+      label(for="telefono") Teléfono:
+      input(type="text" name="telefono" id="telefono")
+    div
+      label(for="contacto_emergencia") Contacto de Emergencia:
+      input(type="text" name="contacto_emergencia" id="contacto_emergencia")
+    div
+      label(for="historial_medico") Historial Médico:
+      textarea(name="historial_medico" id="historial_medico")
+    div
+      button(type="submit") Guardar
