@@ -52,3 +52,28 @@ body {
     bottom: 0;
     width: 100%;
   }
+
+
+  .boton {
+      display: inline-block;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .boton:hover {
+      background-color: #0056b3;
+    }
+    .cancelar {
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .cancelar:hover {
+      background-color: darkred;
+    }

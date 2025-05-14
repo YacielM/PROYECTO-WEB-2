@@ -12,18 +12,18 @@ const Paciente = {
   },
 
   async insertar(paciente) {
-    const {
-      dni, nombre, apellido, genero, direccion, telefono,
-      contacto_emergencia, historial_medico
-    } = paciente;
+  const {
+    dni, nombre, apellido, genero, direccion, telefono,
+    contacto_emergencia, historial_medico
+  } = paciente;
 
-    await db.query(
-      `INSERT INTO pacientes 
-      (dni, nombre, apellido, genero, direccion, telefono, 
-      contacto_emergencia, historial_medico) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [dni, nombre, apellido, genero, direccion, telefono, 
-      contacto_emergencia, historial_medico]
+  await db.query(
+    `INSERT INTO pacientes 
+    (dni, nombre, apellido, genero, direccion, telefono, 
+    contacto_emergencia, historial_medico) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [dni, nombre, apellido, genero, direccion, telefono, 
+    contacto_emergencia, historial_medico]
     );
   },
 

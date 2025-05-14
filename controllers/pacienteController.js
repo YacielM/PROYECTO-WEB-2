@@ -1,10 +1,11 @@
 const Paciente = require('../models/pacienteModel');
 
+// Controlador para obtener todos los pacientes
 exports.obtenerTodos = async (req, res) => {
   try {
     const pacientes = await Paciente.obtenerTodos(); // Obtiene los pacientes desde el modelo
     console.log('Pacientes obtenidos:', pacientes); // Verifica si los datos se obtienen correctamente
-    res.render('paciente/vista', { pacientes }); // Renderiza la vista con los datos
+    res.render('paciente/index', { pacientes }); // Renderiza la vista actualizada (index.pug)
   } catch (error) {
     console.error('Error al obtener los pacientes:', error);
     res.status(500).send('Error al obtener los pacientes');
@@ -13,7 +14,7 @@ exports.obtenerTodos = async (req, res) => {
 
 // Controlador para mostrar el formulario de nuevo paciente
 exports.mostrarFormularioNuevo = (req, res) => {
-  res.render('paciente/nuevo'); // Renderiza el formulario
+  res.render('paciente/nuevo'); // Renderiza el formulario (nuevo.pug)
 };
 
 // Controlador para agregar un nuevo paciente
@@ -27,16 +28,16 @@ exports.insertar = async (req, res) => {
   }
 };
 
-// Controlador para mostrar un paciente por ID
-exports.obtenerPorId = async (req, res) => {
+// Controlador para mostrar el formulario de edición de un paciente
+exports.mostrarFormularioEditar = async (req, res) => {
   try {
     const paciente = await Paciente.obtenerPorId(req.params.id);
     if (!paciente) {
       return res.status(404).send('Paciente no encontrado');
     }
-    res.render('paciente/detalle', { paciente }); // Renderiza una vista con los detalles del paciente
+    res.render('paciente/editar', { paciente }); // Renderiza el formulario de edición (editar.pug)
   } catch (error) {
-    console.error(error);
+    console.error('Error al obtener el paciente:', error);
     res.status(500).send('Error al obtener el paciente');
   }
 };
@@ -47,7 +48,7 @@ exports.actualizar = async (req, res) => {
     await Paciente.actualizar(req.params.id, req.body);
     res.redirect('/pacientes'); // Redirige a la lista de pacientes
   } catch (error) {
-    console.error(error);
+    console.error('Error al actualizar el paciente:', error);
     res.status(500).send('Error al actualizar el paciente');
   }
 };
@@ -58,7 +59,7 @@ exports.eliminar = async (req, res) => {
     await Paciente.eliminar(req.params.id);
     res.redirect('/pacientes'); // Redirige a la lista de pacientes
   } catch (error) {
-    console.error(error);
+    console.error('Error al eliminar el paciente:', error);
     res.status(500).send('Error al eliminar el paciente');
   }
 };

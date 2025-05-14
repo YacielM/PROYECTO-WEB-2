@@ -1,34 +1,36 @@
 extends ../layout.pug
 
 block content
-  h1 Agregar Nuevo Paciente
-  form(action="/pacientes/nuevo" method="POST")
-    div
-      label(for="dni") DNI:
-      input(type="text" name="dni" id="dni" required)
-    div
-      label(for="nombre") Nombre:
-      input(type="text" name="nombre" id="nombre" required)
-    div
-      label(for="apellido") Apellido:
-      input(type="text" name="apellido" id="apellido" required)
-    div
-      label(for="genero") Género:
-      select(name="genero" id="genero" required)
-        option(value="M") Masculino
-        option(value="F") Femenino
-        option(value="O") Otro
-    div
-      label(for="direccion") Dirección:
-      input(type="text" name="direccion" id="direccion")
-    div
-      label(for="telefono") Teléfono:
-      input(type="text" name="telefono" id="telefono")
-    div
-      label(for="contacto_emergencia") Contacto de Emergencia:
-      input(type="text" name="contacto_emergencia" id="contacto_emergencia")
-    div
-      label(for="historial_medico") Historial Médico:
-      textarea(name="historial_medico" id="historial_medico")
-    div
-      button(type="submit") Guardar
+  h1.text-center.mt-4 Agregar Nuevo Paciente
+  div.container.mt-4
+    form(action="/pacientes/nuevo" method="POST" class="row g-3")
+      div.col-md-6
+        label(for="dni" class="form-label") DNI:
+        input(type="text" name="dni" id="dni" class="form-control" required)
+      div.col-md-6
+        label(for="nombre" class="form-label") Nombre:
+        input(type="text" name="nombre" id="nombre" class="form-control" required)
+      div.col-md-6
+        label(for="apellido" class="form-label") Apellido:
+        input(type="text" name="apellido" id="apellido" class="form-control" required)
+      div.col-md-6
+        label(for="genero" class="form-label") Género:
+        select(name="genero" id="genero" class="form-select" required)
+          option(value="M") Masculino
+          option(value="F") Femenino
+          option(value="O") Otro
+      div.col-md-12
+        label(for="direccion" class="form-label") Dirección:
+        input(type="text" name="direccion" id="direccion" class="form-control")
+      div.col-md-6
+        label(for="telefono" class="form-label") Teléfono:
+        input(type="text" name="telefono" id="telefono" class="form-control")
+      div.col-md-6
+        label(for="contacto_emergencia" class="form-label") Contacto de Emergencia:
+        input(type="text" name="contacto_emergencia" id="contacto_emergencia" class="form-control")
+      div.col-md-12
+        label(for="historial_medico" class="form-label") Historial Médico:
+        textarea(name="historial_medico" id="historial_medico" class="form-control")
+      div.col-12
+        button(type="submit" class="btn btn-success") Guardar
+        a.btn.btn-secondary.ms-2(href="/pacientes") Cancelar

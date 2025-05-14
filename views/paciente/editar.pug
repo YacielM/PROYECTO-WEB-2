@@ -1,0 +1,36 @@
+extends ../layout.pug
+
+block content
+  h1.text-center.mt-4 Editar Paciente
+  div.container.mt-4
+    form(action=`/pacientes/editar/${paciente.id}` method="POST" class="row g-3")
+      div.col-md-6
+        label(for="dni" class="form-label") DNI:
+        input(type="text" name="dni" id="dni" class="form-control" value=paciente.dni required)
+      div.col-md-6
+        label(for="nombre" class="form-label") Nombre:
+        input(type="text" name="nombre" id="nombre" class="form-control" value=paciente.nombre required)
+      div.col-md-6
+        label(for="apellido" class="form-label") Apellido:
+        input(type="text" name="apellido" id="apellido" class="form-control" value=paciente.apellido required)
+      div.col-md-6
+        label(for="genero" class="form-label") Género:
+        select(name="genero" id="genero" class="form-select" required)
+          option(value="M" selected=paciente.genero=="M") Masculino
+          option(value="F" selected=paciente.genero=="F") Femenino
+          option(value="O" selected=paciente.genero=="O") Otro
+      div.col-md-12
+        label(for="direccion" class="form-label") Dirección:
+        input(type="text" name="direccion" id="direccion" class="form-control" value=paciente.direccion)
+      div.col-md-6
+        label(for="telefono" class="form-label") Teléfono:
+        input(type="text" name="telefono" id="telefono" class="form-control" value=paciente.telefono)
+      div.col-md-6
+        label(for="contacto_emergencia" class="form-label") Contacto de Emergencia:
+        input(type="text" name="contacto_emergencia" id="contacto_emergencia" class="form-control" value=paciente.contacto_emergencia)
+      div.col-md-12
+        label(for="historial_medico" class="form-label") Historial Médico:
+        textarea(name="historial_medico" id="historial_medico" class="form-control")= paciente.historial_medico
+      div.col-12
+        button(type="submit" class="btn btn-primary") Guardar Cambios
+        a.btn.btn-secondary.ms-2(href="/pacientes") Cancelar

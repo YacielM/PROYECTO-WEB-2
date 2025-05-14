@@ -8,6 +8,9 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views')); // Ruta a la carpeta de vistas
 
+// Middleware para procesar datos de formularios
+app.use(express.urlencoded({ extended: true }));
+
 // Servir archivos estáticos desde la carpeta 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -17,9 +20,11 @@ app.get('/', (req, res) => {
 });
 
 const pacienteRoutes = require('./routes/pacienteRoutes');
+const admisionesRoutes = require('./routes/admisionesRoutes');
 
-// Usar las rutas de pacientes
+// Usar las rutas de pacientes y admisiones
 app.use('/pacientes', pacienteRoutes);
+app.use('/admisiones', admisionesRoutes);
 
 // Iniciar el servidor
 const PORT = 3000;

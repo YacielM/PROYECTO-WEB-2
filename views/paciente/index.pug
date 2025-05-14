@@ -1,0 +1,40 @@
+extends ../layout.pug
+
+block content
+  h1.text-center.mt-4 Lista de Pacientes
+  div.container.mt-4
+    div.d-flex.justify-content-between.mb-3
+      h2.text-start Pacientes Registrados
+      a.btn.btn-success(href="/pacientes/nuevo") Agregar Nuevo Paciente
+    table.table.table-striped.table-hover
+      thead
+        tr
+          th DNI
+          th Nombre
+          th Apellido
+          th Género
+          th Dirección
+          th Teléfono
+          th Contacto de Emergencia
+          th Historial Médico
+          th Acciones
+      tbody
+        if pacientes.length > 0
+          each paciente in pacientes
+            tr
+              td= paciente.dni
+              td= paciente.nombre
+              td= paciente.apellido
+              td= paciente.genero
+              td= paciente.direccion
+              td= paciente.telefono
+              td= paciente.contacto_emergencia
+              td= paciente.historial_medico
+              td
+                a.btn.btn-primary.btn-sm(href=`/pacientes/${paciente.id}`) Ver
+                a.btn.btn-warning.btn-sm.ms-2(href=`/pacientes/editar/${paciente.id}`) Editar
+                form(action=`/pacientes/eliminar/${paciente.id}` method="POST" style="display:inline")
+                  button.btn.btn-danger.btn-sm.ms-2(type="submit") Eliminar
+        else
+          tr
+            td.text-center(colspan="8") No hay pacientes registrados
