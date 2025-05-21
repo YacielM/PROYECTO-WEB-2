@@ -1,65 +1,67 @@
 const Paciente = require('../models/pacienteModel');
 
-// Controlador para obtener todos los pacientes
+// Obtener todos los pacientes
 exports.obtenerTodos = async (req, res) => {
   try {
-    const pacientes = await Paciente.obtenerTodos(); // Obtiene los pacientes desde el modelo
-    console.log('Pacientes obtenidos:', pacientes); // Verifica si los datos se obtienen correctamente
-    res.render('paciente/index', { pacientes }); // Renderiza la vista actualizada (index.pug)
+    const pacientes = await Paciente.findAll();
+    res.render('paciente/index', { pacientes });
   } catch (error) {
-    console.error('Error al obtener los pacientes:', error);
-    res.status(500).send('Error al obtener los pacientes');
+    res.status(500).render('error', { mensaje: 'Error al cargar pacientes' });
   }
 };
 
-// Controlador para mostrar el formulario de nuevo paciente
+// Mostrar formulario de nuevo paciente (vista)
 exports.mostrarFormularioNuevo = (req, res) => {
-  res.render('paciente/nuevo'); // Renderiza el formulario (nuevo.pug)
+  res.render('paciente/nuevo');
 };
 
-// Controlador para agregar un nuevo paciente
+// Insertar nuevo paciente (POST)
 exports.insertar = async (req, res) => {
   try {
-    await Paciente.insertar(req.body); // Inserta los datos enviados desde el formulario
-    res.redirect('/pacientes'); // Redirige a la lista de pacientes
+    await Paciente.create(req.body);
+    res.redirect('/pacientes');
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Error al agregar el paciente');
+    res.render('paciente/nuevo', { 
+      error: 'Error al crear paciente: ' + error.message,
+      datos: req.body // Mantener datos ingresados
+    });
   }
 };
 
-// Controlador para mostrar el formulario de edición de un paciente
+// Mostrar formulario de edición (vista)
 exports.mostrarFormularioEditar = async (req, res) => {
   try {
-    const paciente = await Paciente.obtenerPorId(req.params.id);
-    if (!paciente) {
-      return res.status(404).send('Paciente no encontrado');
-    }
-    res.render('paciente/editar', { paciente }); // Renderiza el formulario de edición (editar.pug)
+    const paciente = await Paciente.findByPk(req.params.id);
+    if (!paciente) throw new Error('Paciente no encontrado');
+    res.render('paciente/editar', { paciente });
   } catch (error) {
-    console.error('Error al obtener el paciente:', error);
-    res.status(500).send('Error al obtener el paciente');
+    res.redirect('/pacientes');
   }
 };
 
-// Controlador para actualizar un paciente
+// Actualizar paciente (POST)
 exports.actualizar = async (req, res) => {
   try {
-    await Paciente.actualizar(req.params.id, req.body);
-    res.redirect('/pacientes'); // Redirige a la lista de pacientes
+    const paciente = await Paciente.findByPk(req.params.id);
+    if (!paciente) throw new Error('Paciente no encontrado');
+    await paciente.update(req.body);
+    res.redirect('/pacientes');
   } catch (error) {
-    console.error('Error al actualizar el paciente:', error);
-    res.status(500).send('Error al actualizar el paciente');
+    res.render('paciente/editar', { 
+      error: 'Error al actualizar: ' + error.message,
+      paciente: req.body 
+    });
   }
 };
 
-// Controlador para eliminar un paciente
+// Eliminar paciente (POST)
 exports.eliminar = async (req, res) => {
   try {
-    await Paciente.eliminar(req.params.id);
-    res.redirect('/pacientes'); // Redirige a la lista de pacientes
+    const paciente = await Paciente.findByPk(req.params.id);
+    if (!paciente) throw new Error('Paciente no encontrado');
+    await paciente.destroy();
+    res.redirect('/pacientes');
   } catch (error) {
-    console.error('Error al eliminar el paciente:', error);
-    res.status(500).send('Error al eliminar el paciente');
+    res.redirect('/pacientes');
   }
 };

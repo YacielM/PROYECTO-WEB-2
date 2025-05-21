@@ -26,6 +26,14 @@ const admisionesRoutes = require('./routes/admisionesRoutes');
 app.use('/pacientes', pacienteRoutes);
 app.use('/admisiones', admisionesRoutes);
 
+// Después de las rutas
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).render('error', { 
+    mensaje: 'Error interno del servidor. Contacte al administrador.' 
+  });
+});
+
 // Iniciar el servidor
 const PORT = 3000;
 app.listen(PORT, () => {

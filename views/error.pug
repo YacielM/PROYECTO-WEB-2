@@ -1,0 +1,8 @@
+//- views/error.pug
+extends layout.pug
+
+block content
+  .container.mt-4
+    .alert.alert-danger
+      h2= mensaje || 'Ocurrió un error inesperado'
+    a.btn.btn-primary(href="/") Volver al inicio

@@ -1,0 +1,75 @@
+//- views/admisiones/editar.pug
+extends ../layout.pug
+
+block content
+  .container.mt-4
+    h1.text-center Editar Admisión
+    .card.shadow
+      .card-body
+        if error
+          .alert.alert-danger= error
+
+        form(action=`/admisiones/editar/${admision.id}` method="POST")
+          .row.g-3
+            //- Paciente (solo lectura)
+            .col-md-6
+              label.form-label Paciente:
+              input.form-control(
+                type="text" 
+                value=`${admision.Paciente.nombre} ${admision.Paciente.apellido}` 
+                readonly
+              )
+
+            //- Cama Disponible
+            .col-md-6
+              label.form-label(for="cama_id") Cambiar Cama:
+              select.form-select(name="cama_id" required)
+                option(value="") Seleccione una cama...
+                each cama in camas
+                  option(
+                    value=cama.id 
+                    selected=(cama.id === admision.cama_id)
+                  )= `Cama ${cama.numero_cama} - Sala ${cama.Sala.numero_sala}`
+
+            //- Tipo de Admisión
+            .col-md-6
+              label.form-label(for="tipo_admision") Tipo:
+              select.form-select(name="tipo_admision" required)
+                option(
+                  value="Programada" 
+                  selected=(admision.tipo_admision === 'Programada')
+                ) Programada
+                option(
+                  value="Emergencia" 
+                  selected=(admision.tipo_admision === 'Emergencia')
+                ) Emergencia
+                option(
+                  value="Derivada" 
+                  selected=(admision.tipo_admision === 'Derivada')
+                ) Derivada
+
+            //- Estado
+            .col-md-6
+              label.form-label(for="estado") Estado:
+              select.form-select(name="estado" required)
+                option(
+                  value="Activo" 
+                  selected=(admision.estado === 'Activo')
+                ) Activo
+                option(
+                  value="Cancelado" 
+                  selected=(admision.estado === 'Cancelado')
+                ) Cancelado
+                option(
+                  value="Dados de Alta" 
+                  selected=(admision.estado === 'Dados de Alta')
+                ) Dados de Alta
+
+            //- Motivo
+            .col-md-12
+              label.form-label(for="motivo") Motivo:
+              textarea.form-control(name="motivo" rows="3" required)= admision.motivo
+
+          .mt-4
+            button.btn.btn-primary(type="submit") Guardar Cambios
+            a.btn.btn-secondary.ms-2(href="/admisiones") Cancelar

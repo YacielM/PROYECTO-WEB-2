@@ -1,56 +1,49 @@
-const db = require('../config/db.js');
+const { Model, DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
-const Paciente = {
-  async obtenerTodos() {
-    try {
-      const [rows] = await db.query(`SELECT * FROM pacientes`);
-      return rows; // Devuelve los pacientes obtenidos
-    } catch (error) {
-      console.error('Error al obtener los pacientes:', error);
-      throw error; // Lanza el error para que el controlador lo maneje
+class Paciente extends Model {}
+
+Paciente.init(
+  {
+    dni: {
+      type: DataTypes.STRING(15),
+      allowNull: false,
+      unique: {
+        msg: 'El DNI ya está registrado'
+      }
+    },
+    nombre: {
+      type: DataTypes.STRING(50),
+      allowNull: false
+    },
+    apellido: {
+      type: DataTypes.STRING(50),
+      allowNull: false
+    },
+    genero: {
+      type: DataTypes.ENUM('M', 'F', 'O'),
+      allowNull: false
+    },
+    direccion: DataTypes.STRING(255),
+    telefono: DataTypes.STRING(50),
+    contacto_emergencia: DataTypes.STRING(100),
+    historial_medico: DataTypes.TEXT
+  },
+  {
+    sequelize,
+    modelName: 'Paciente',
+    tableName: 'pacientes',
+    timestamps: true,
+    createdAt: 'creado_en',
+    updatedAt: false,
+    validate: {
+      camposObligatorios() {
+        if (!this.dni || !this.nombre || !this.apellido || !this.genero) {
+          throw new Error('DNI, nombre, apellido y género son obligatorios');
+        }
+      }
     }
-  },
-
-  async insertar(paciente) {
-  const {
-    dni, nombre, apellido, genero, direccion, telefono,
-    contacto_emergencia, historial_medico
-  } = paciente;
-
-  await db.query(
-    `INSERT INTO pacientes 
-    (dni, nombre, apellido, genero, direccion, telefono, 
-    contacto_emergencia, historial_medico) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [dni, nombre, apellido, genero, direccion, telefono, 
-    contacto_emergencia, historial_medico]
-    );
-  },
-
-  async actualizar(id, paciente) {
-    const {
-      dni, nombre, apellido, genero, direccion, telefono,
-      contacto_emergencia, historial_medico
-    } = paciente;
-
-    await db.query(
-      `UPDATE pacientes 
-      SET dni = ?, nombre = ?, apellido = ?, genero = ?, 
-      direccion = ?, telefono = ?, contacto_emergencia = ?, historial_medico = ? 
-      WHERE id = ?`,
-      [dni, nombre, apellido, genero, direccion, telefono, 
-      contacto_emergencia, historial_medico, id]
-    );
-  },
-
-  async eliminar(id) {
-    await db.query(`DELETE FROM pacientes WHERE id = ?`, [id]);
-  },
-
-  async obtenerPorId(id) {
-    const [rows] = await db.query(`SELECT * FROM pacientes WHERE id = ?`, [id]);
-    return rows[0];
   }
-};
+);
 
 module.exports = Paciente;

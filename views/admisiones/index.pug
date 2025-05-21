@@ -3,14 +3,17 @@ extends ../layout.pug
 block content
   h1.text-center.mt-4 Lista de Admisiones
   div.container.mt-4
+    div.d-flex.justify-content-end.mb-3
+      a.btn.btn-success(href="/admisiones/nuevo") Nueva Admisión
     table.table.table-striped.table-hover
       thead
         tr
           th ID
           th Paciente
-          th Fecha de Admisión
-          th Tipo de Admisión
+          th Fecha Admisión
+          th Tipo
           th Estado
+          th Cama
           th Acciones
       tbody
         if admisiones.length > 0
@@ -21,6 +24,7 @@ block content
               td= admision.fecha_admision
               td= admision.tipo_admision
               td= admision.estado
+              td= admision.cama
               td
                 a.btn.btn-primary.btn-sm(href=`/admisiones/${admision.id}`) Ver
                 a.btn.btn-warning.btn-sm.ms-2(href=`/admisiones/editar/${admision.id}`) Editar
@@ -28,4 +32,4 @@ block content
                   button.btn.btn-danger.btn-sm.ms-2(type="submit") Eliminar
         else
           tr
-            td.text-center(colspan="6") No hay admisiones registradas
+            td.text-center(colspan="7") No hay admisiones registradas

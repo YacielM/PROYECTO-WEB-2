@@ -1,6 +1,8 @@
 extends layout.pug
 
 block content
+if error
+  .alert.alert-danger= error
   h1 Sistema Hospitalario HIS
   p Bienvenido al sistema de gestión hospitalaria. Seleccione una de las opciones para comenzar.
   
@@ -8,6 +10,6 @@ block content
     ul
       li: a(href="/pacientes") Gestión de Pacientes
       li: a(href="/admisiones") Gestión de Admisiones
-      li: a(href="/evaluaciones_medicas") Evaluaciones Médicas
       li: a(href="/evaluaciones_enfermeria") Evaluaciones de Enfermería
+      li: a(href="/evaluaciones_medicas") Evaluaciones Médicas
       li: a(href="/habitaciones") Gestión de Habitaciones
