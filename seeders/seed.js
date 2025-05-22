@@ -5,6 +5,7 @@ const Sala = require('../models/salaModel');
 const Cama = require('../models/camaModel');
 const Admision = require('../models/admisionModel');
 const EvaluacionEnfermeria = require('../models/evaluacionEnfermeriaModel');
+const EvaluacionMedica = require('../models/evaluacionMedicaModel');
 
 async function seed() {
   try {
@@ -38,71 +39,101 @@ async function seed() {
     ]);
     console.log(' Camas creadas');
 
-    // 3. Crear Pacientes
+    // 3. Crear Pacientes con historial médico
     const pacientes = await Paciente.bulkCreate([
       {
         dni: '33444555',
         nombre: 'Carlos',
         apellido: 'Gómez',
         genero: 'M',
+        fecha_nacimiento: '1985-07-15',
         direccion: 'Av. Siempre Viva 742',
         telefono: '555-1234',
-        contacto_emergencia: 'María Gómez'
+        contacto_emergencia: 'María Gómez',
+        historial_medico: 'Hipertensión arterial, alergia a la penicilina, cirugía de apéndice en 2010.'
       },
       {
         dni: '25666777',
         nombre: 'Ana',
         apellido: 'López',
         genero: 'F',
+        fecha_nacimiento: '1992-03-22',
         direccion: 'Calle Falsa 123',
         telefono: '555-5678',
-        contacto_emergencia: 'Pedro López'
+        contacto_emergencia: 'Pedro López',
+        historial_medico: 'Asma leve, vacunación completa, sin antecedentes quirúrgicos.'
       },
       {
         dni: '37888999',
         nombre: 'Luisa',
         apellido: 'Martínez',
         genero: 'F',
+        fecha_nacimiento: '1978-11-30',
         direccion: 'Boulevard Central 456',
         telefono: '555-9012',
-        contacto_emergencia: 'Juan Martínez'
+        contacto_emergencia: 'Juan Martínez',
+        historial_medico: 'Diabetes tipo 2, tratamiento con metformina, retinopatía diabética en control.'
       }
     ]);
     console.log(' Pacientes creados');
 
     // 4. Crear Admisiones de prueba
-    await Admision.bulkCreate([
+    const admisiones = await Admision.bulkCreate([
       {
-        paciente_id: pacientes[0].id, // Carlos Gómez
-        cama_id: camas[4].id, // Cama ocupada en Sala 201
+        paciente_id: pacientes[0].id, // Carlos
+        cama_id: camas[3].id, // Cama 2 en Sala 201 (En Limpieza)
         tipo_admision: 'Emergencia',
         estado: 'Activo',
-        motivo: 'Fractura de brazo'
+        motivo: 'Dolor torácico agudo'
       },
       {
-        paciente_id: pacientes[1].id, // Ana López
-        cama_id: camas[7].id, // Cama en Pediatría
+        paciente_id: pacientes[1].id, // Ana
+        cama_id: camas[6].id, // Cama 1 en Pediatría
         tipo_admision: 'Programada',
         estado: 'Activo',
-        motivo: 'Cirugía programada'
+        motivo: 'Cirugía de vesícula programada'
       }
     ]);
+    console.log(' Admisiones creadas');
 
-    // 5. Crear Evaluaciones de enfermería
+    // 5. Evaluaciones de Enfermería
     await EvaluacionEnfermeria.bulkCreate([
       {
-    admision_id: 1, // ID de admisión existente
-    signos_vitales: "TA: 120/80, FC: 75",
-    sintomas: "Dolor torácico leve",
-    plan_cuidado: "Monitorizar cada 2 horas",
-    },
+        admision_id: admisiones[0].id,
+        signos_vitales: "TA: 150/90, FC: 88, Temp: 36.8°C",
+        sintomas: "Dolor precordial, dificultad respiratoria",
+        plan_cuidado: "Monitorización cardíaca, administrar nitroglicerina sublingual."
+      },
+      {
+        admision_id: admisiones[1].id,
+        signos_vitales: "TA: 120/80, FC: 72, Temp: 36.5°C",
+        sintomas: "Náuseas postquirúrgicas",
+        plan_cuidado: "Administrar antieméticos según protocolo."
+      }
     ]);
-    console.log(' Admisiones de prueba creadas');
+    console.log(' Evaluaciones de enfermería creadas');
 
-    console.log(' ¡Datos de prueba insertados exitosamente!');
+    // 6. Evaluaciones Médicas
+    await EvaluacionMedica.bulkCreate([
+      {
+        admision_id: admisiones[0].id,
+        diagnostico: "Síndrome coronario agudo",
+        tratamiento: "Aspirina 300mg, clopidogrel 75mg, reposo absoluto",
+        seguimiento: "Ecocardiograma en 24 horas"
+      },
+      {
+        admision_id: admisiones[1].id,
+        diagnostico: "Colecistitis aguda",
+        tratamiento: "Colecistectomía laparoscópica exitosa",
+        seguimiento: "Retirar puntos en 10 días"
+      }
+    ]);
+    console.log(' Evaluaciones médicas creadas');
+
+    console.log('¡Datos de prueba insertados exitosamente!');
     
   } catch (error) {
-    console.error(' Error en el seeder:', error);
+    console.error('Error en el seeder:', error);
   } finally {
     process.exit();
   }

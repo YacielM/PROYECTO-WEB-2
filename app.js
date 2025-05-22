@@ -22,11 +22,13 @@ app.get('/', (req, res) => {
 const pacienteRoutes = require('./routes/pacienteRoutes');
 const admisionesRoutes = require('./routes/admisionesRoutes');
 const evaluacionesEnfermeriaRoutes = require('./routes/evaluacionesEnfermeriaRoutes');
+const evaluacionesMedicasRoutes = require ("./routes/evaluacionesMedicasRoutes");
 
 // Usar las rutas de pacientes y admisiones
 app.use('/pacientes', pacienteRoutes);
 app.use('/admisiones', admisionesRoutes);
 app.use("/eva_enfermeria", evaluacionesEnfermeriaRoutes);
+app.use("/eva_medicas", evaluacionesMedicasRoutes);
 
 // Después de las rutas
 app.use((err, req, res, next) => {

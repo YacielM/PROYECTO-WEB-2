@@ -1,40 +1,39 @@
-// models/evaluacionEnfermeriaModel.js
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
 
-class EvaluacionEnfermeria extends Model {}
+class EvaluacionMedica extends Model {}
 
-EvaluacionEnfermeria.init(
+EvaluacionMedica.init(
   {
-    signos_vitales: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    sintomas: {
+    diagnostico: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    plan_cuidado: {
+    tratamiento: {
       type: DataTypes.TEXT,
       allowNull: false,
+    },
+    seguimiento: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
     admision_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "admisiones",
+        model: "admisiones", // nombre de la tabla
         key: "id",
       },
     },
   },
   {
     sequelize,
-    modelName: "EvaluacionEnfermeria",
-    tableName: "evaluaciones_enfermeria",
+    modelName: "EvaluacionMedica",
+    tableName: "evaluaciones_medicas",
     timestamps: true,
     createdAt: "fecha_evaluacion",
     updatedAt: false,
   }
 );
 
-module.exports = EvaluacionEnfermeria;
+module.exports = EvaluacionMedica;

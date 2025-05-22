@@ -1,0 +1,30 @@
+extends ../layout.pug
+
+block content
+  .container.mt-4
+    h1.text-center Evaluaciones Médicas
+    a.btn.btn-success.mb-3(href="/eva_medicas/nuevo") Nueva Evaluación
+    if evaluaciones && evaluaciones.length > 0
+      table.table.table-striped
+        thead
+          tr
+            th ID
+            th Fecha
+            th Paciente
+            th Cama
+            th Diagnóstico
+            th Tratamiento
+            th Acciones
+        tbody
+          each evaluacion in evaluaciones
+            tr
+              td= evaluacion.id
+              td= evaluacion.fecha_evaluacion && evaluacion.fecha_evaluacion.toLocaleDateString ? evaluacion.fecha_evaluacion.toLocaleDateString('es-AR') : 'Sin fecha'
+              td= evaluacion.Admision && evaluacion.Admision.Paciente ? `${evaluacion.Admision.Paciente.nombre} ${evaluacion.Admision.Paciente.apellido}` : 'Sin paciente'
+              td= evaluacion.Admision && evaluacion.Admision.Cama && evaluacion.Admision.Cama.Sala ? `Sala ${evaluacion.Admision.Cama.Sala.numero_sala} - Cama ${evaluacion.Admision.Cama.numero_cama}` : 'Sin cama'
+              td= evaluacion.diagnostico ? evaluacion.diagnostico.substring(0, 50) + '...' : ''
+              td= evaluacion.tratamiento ? evaluacion.tratamiento.substring(0, 50) + '...' : ''
+              td
+                a.btn.btn-info.btn-sm(href=`/eva_medicas/${evaluacion.id}`) Ver
+    else
+      p.text-center No hay evaluaciones registradas.

@@ -1,0 +1,23 @@
+//- views/eva_medicas/nuevo.pug
+extends ../layout.pug
+
+block content
+  .container.mt-4
+    h1.text-center Nueva Evaluación Médica
+    form(action="/eva_medicas/nuevo" method="POST")
+      .mb-3
+        label.form-label(for="admision_id") Admisión:
+        select.form-select(name="admision_id" required)
+          option(value="") Seleccione una admisión...
+          each admision in admisiones
+            option(value=admision.id)= `Adm. ${admision.id} - ${admision.Paciente.nombre}`
+      .mb-3
+        label.form-label(for="diagnostico") Diagnóstico:
+        textarea.form-control(name="diagnostico" rows="3" required)
+      .mb-3
+        label.form-label(for="tratamiento") Tratamiento:
+        textarea.form-control(name="tratamiento" rows="3" required)
+      .mb-3
+        label.form-label(for="seguimiento") Seguimiento:
+        textarea.form-control(name="seguimiento" rows="3")
+      button.btn.btn-primary(type="submit") Guardar

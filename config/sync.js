@@ -1,10 +1,6 @@
 // sync.js
 const sequelize = require('../config/db');
-const Admision = require('../models/admisionModel'); // Añade esta línea
-const Paciente = require('../models/pacienteModel');
-const Cama = require('../models/camaModel');
-const EvaluacionEnfermeria = require('../models/evaluacionEnfermeriaModel'); // Añade esta línea
-const Sala = require('../models/salaModel'); // Añade esta línea
+const { EvaluacionEnfermeria, EvaluacionMedica, Admision, Paciente, Cama, Sala } = require('../models');
 
 
 async function syncDB() {
