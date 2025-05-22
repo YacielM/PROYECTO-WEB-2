@@ -1,0 +1,24 @@
+extends ../layout.pug
+
+block content
+  .container.mt-4
+    h1.text-center Nueva Evaluación de Enfermería
+    if error
+      .alert.alert-danger= error
+    form(action="/eva_enfermeria/nuevo" method="POST")
+      .mb-3
+        label.form-label(for="admision_id") Admisión:
+        select.form-select(name="admision_id" required)
+          option(value="") Seleccione una admisión...
+          each admision in admisiones
+            option(value=admision.id) Admisión #{admision.id}
+      .mb-3
+        label.form-label(for="signos_vitales") Signos Vitales:
+        input.form-control(type="text" name="signos_vitales" required)
+      .mb-3
+        label.form-label(for="sintomas") Síntomas:
+        textarea.form-control(name="sintomas" rows="3" required)
+      .mb-3
+        label.form-label(for="plan_cuidado") Plan de Cuidado:
+        textarea.form-control(name="plan_cuidado" rows="3" required)
+      button.btn.btn-primary(type="submit") Guardar

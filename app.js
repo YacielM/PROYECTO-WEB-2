@@ -18,13 +18,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.render('layout'); // Renderiza el archivo layout.pug
 });
-
+//RUTAS
 const pacienteRoutes = require('./routes/pacienteRoutes');
 const admisionesRoutes = require('./routes/admisionesRoutes');
+const evaluacionesEnfermeriaRoutes = require('./routes/evaluacionesEnfermeriaRoutes');
 
 // Usar las rutas de pacientes y admisiones
 app.use('/pacientes', pacienteRoutes);
 app.use('/admisiones', admisionesRoutes);
+app.use("/eva_enfermeria", evaluacionesEnfermeriaRoutes);
 
 // Después de las rutas
 app.use((err, req, res, next) => {

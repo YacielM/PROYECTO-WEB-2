@@ -4,6 +4,7 @@ const Paciente = require('../models/pacienteModel');
 const Sala = require('../models/salaModel');
 const Cama = require('../models/camaModel');
 const Admision = require('../models/admisionModel');
+const EvaluacionEnfermeria = require('../models/evaluacionEnfermeriaModel');
 
 async function seed() {
   try {
@@ -85,6 +86,16 @@ async function seed() {
         estado: 'Activo',
         motivo: 'Cirugía programada'
       }
+    ]);
+
+    // 5. Crear Evaluaciones de enfermería
+    await EvaluacionEnfermeria.bulkCreate([
+      {
+    admision_id: 1, // ID de admisión existente
+    signos_vitales: "TA: 120/80, FC: 75",
+    sintomas: "Dolor torácico leve",
+    plan_cuidado: "Monitorizar cada 2 horas",
+    },
     ]);
     console.log(' Admisiones de prueba creadas');
 
