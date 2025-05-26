@@ -10,7 +10,7 @@ block content
         select.form-select(name="admision_id" required)
           option(value="") Seleccione una admisión...
           each admision in admisiones
-            option(value=admision.id)= `Adm. ${admision.id} - ${admision.Paciente.nombre}`
+            option(value=admision.id)= `Admisión ${admision.id} - ${admision.Paciente.nombre}`
       .mb-3
         label.form-label(for="diagnostico") Diagnóstico:
         textarea.form-control(name="diagnostico" rows="3" required)

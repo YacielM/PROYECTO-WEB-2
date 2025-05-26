@@ -11,6 +11,7 @@ const EvaluacionMedica = require('./evaluacionMedicaModel');
 Admision.belongsTo(Paciente, { foreignKey: "paciente_id" });
 Admision.belongsTo(Cama, { foreignKey: "cama_id" });
 
+
 // Admisión -> Evaluaciones
 Admision.hasMany(EvaluacionEnfermeria, { 
   foreignKey: "admision_id",
@@ -39,6 +40,10 @@ Cama.belongsTo(Sala, {
 Sala.hasMany(Cama, {
   foreignKey: "sala_id"
 });
+
+Cama.hasMany(Admision, { 
+  foreignKey: "cama_id"
+ });
 
 module.exports = {
   Paciente,

@@ -15,8 +15,8 @@ block content
             .col-md-6
               label.form-label Paciente:
               input.form-control(
-                type="text" 
-                value=`${admision.Paciente.nombre} ${admision.Paciente.apellido}` 
+                type="text"
+                value=admision.Paciente ? `${admision.Paciente.nombre} ${admision.Paciente.apellido}` : ''
                 readonly
               )
 
@@ -27,7 +27,7 @@ block content
                 option(value="") Seleccione una cama...
                 each cama in camas
                   option(
-                    value=cama.id 
+                    value=cama.id
                     selected=(cama.id === admision.cama_id)
                   )= `Cama ${cama.numero_cama} - Sala ${cama.Sala.numero_sala}`
 
@@ -36,34 +36,17 @@ block content
               label.form-label(for="tipo_admision") Tipo:
               select.form-select(name="tipo_admision" required)
                 option(
-                  value="Programada" 
+                  value="Programada"
                   selected=(admision.tipo_admision === 'Programada')
                 ) Programada
                 option(
-                  value="Emergencia" 
+                  value="Emergencia"
                   selected=(admision.tipo_admision === 'Emergencia')
                 ) Emergencia
                 option(
-                  value="Derivada" 
+                  value="Derivada"
                   selected=(admision.tipo_admision === 'Derivada')
                 ) Derivada
-
-            //- Estado
-            .col-md-6
-              label.form-label(for="estado") Estado:
-              select.form-select(name="estado" required)
-                option(
-                  value="Activo" 
-                  selected=(admision.estado === 'Activo')
-                ) Activo
-                option(
-                  value="Cancelado" 
-                  selected=(admision.estado === 'Cancelado')
-                ) Cancelado
-                option(
-                  value="Dados de Alta" 
-                  selected=(admision.estado === 'Dados de Alta')
-                ) Dados de Alta
 
             //- Motivo
             .col-md-12

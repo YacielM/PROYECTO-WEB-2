@@ -1,7 +1,8 @@
 // models/camaModel.js
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const Sala = require('./salaModel'); // Asegúrate de tener este modelo
+
+
 
 class Cama extends Model {}
 
@@ -41,13 +42,6 @@ Cama.init(
   }
 );
 
-// Relación con Sala (1 sala tiene muchas camas)
-Cama.belongsTo(Sala, { 
-  foreignKey: {
-    name: 'sala_id',
-    allowNull: false
-  },
-  onDelete: 'CASCADE' // Si se elimina la sala, se borran sus camas
-});
+
 
 module.exports = Cama;

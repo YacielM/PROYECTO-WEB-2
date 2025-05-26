@@ -11,7 +11,7 @@ block content
         select.form-select(name="admision_id" required)
           option(value="") Seleccione una admisión...
           each admision in admisiones
-            option(value=admision.id) Admisión #{admision.id}
+            option(value=admision.id)= `Admisión ${admision.id} - ${admision.Paciente.nombre}`
       .mb-3
         label.form-label(for="signos_vitales") Signos Vitales:
         input.form-control(type="text" name="signos_vitales" required)
@@ -22,3 +22,4 @@ block content
         label.form-label(for="plan_cuidado") Plan de Cuidado:
         textarea.form-control(name="plan_cuidado" rows="3" required)
       button.btn.btn-primary(type="submit") Guardar
+

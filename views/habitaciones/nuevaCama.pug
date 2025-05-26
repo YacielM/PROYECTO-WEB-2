@@ -1,0 +1,29 @@
+extends ../layout.pug
+
+block content
+  .container.mt-4
+    h2 Nueva Cama
+    form(action="/habitaciones/nueva-cama" method="POST")
+      .mb-3
+        label.form-label(for="sala_id") Sala:
+        select.form-select(name="sala_id" required)
+          option(value="") Seleccione una sala...
+          each sala in salas
+            option(value=sala.id) #{sala.ala} - Sala #{sala.numero_sala}
+      .mb-3
+        label.form-label(for="numero_cama") Número de Cama:
+        input.form-control(type="number" name="numero_cama" min="1" required)
+      .mb-3
+        label.form-label(for="estado") Estado:
+        select.form-select(name="estado" required)
+          option(value="Disponible") Disponible
+          option(value="En Limpieza") En Limpieza
+          option(value="Ocupada") Ocupada
+      .mb-3
+        label.form-label(for="restriccion_genero") Restricción de género:
+        select.form-select(name="restriccion_genero" required)
+          option(value="Ninguno") Ninguno
+          option(value="M") Masculino
+          option(value="F") Femenino
+      button.btn.btn-success(type="submit") Crear Cama
+      a.btn.btn-secondary.ms-2(href="/habitaciones") Cancelar

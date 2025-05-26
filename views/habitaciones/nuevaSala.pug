@@ -1,0 +1,17 @@
+extends ../layout.pug
+
+block content
+  .container.mt-4
+    h2 Nueva Sala
+    form(action="/habitaciones/nueva-sala" method="POST")
+      .mb-3
+        label.form-label(for="ala") Ala:
+        input.form-control(type="text" name="ala" required)
+      .mb-3
+        label.form-label(for="numero_sala") Número de Sala:
+        input.form-control(type="text" name="numero_sala" required)
+      .mb-3
+        label.form-label(for="capacidad") Capacidad (1 o 2):
+        input.form-control(type="number" name="capacidad" min="1" max="2" required)
+      button.btn.btn-success(type="submit") Crear Sala
+      a.btn.btn-secondary.ms-2(href="/habitaciones") Cancelar

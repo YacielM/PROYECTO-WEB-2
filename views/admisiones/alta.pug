@@ -1,0 +1,22 @@
+//- views/admisiones/alta.pug
+extends ../layout.pug
+
+block content
+  .container.mt-4
+    h1.text-center Dar de Alta al Paciente
+    .card.shadow
+      .card-body
+        form(action=`/admisiones/alta/${admision.id}` method="POST")
+          .mb-3
+            label.form-label(for="tipo_alta") Tipo de Alta:
+            select.form-select(name="tipo_alta" required)
+              option(value="") Seleccione el tipo de alta...
+              option(value="Curado") Curado completamente
+              option(value="Traslado") Traslado a otro hospital
+              option(value="Voluntaria") Alta voluntaria del paciente
+              option(value="Fallecido") Fallecimiento
+          .mb-3
+            label.form-label(for="motivo_alta") Motivo (opcional):
+            textarea.form-control(name="motivo_alta" rows="3")
+          button.btn.btn-success(type="submit") Confirmar Alta
+          a.btn.btn-secondary.ms-2(href="/admisiones") Cancelar

@@ -26,10 +26,14 @@ block content
               td= admision.estado
               td= admision.cama
               td
-                a.btn.btn-primary.btn-sm(href=`/admisiones/${admision.id}`) Ver
+                if admision.estado === 'Dados de Alta'
+                  form(action=`/admisiones/reactivar/${admision.id}` method="POST" style="display:inline")
+                    button.btn.btn-success.btn-sm(type="submit") Reactivar
+                else
+                  a.btn.btn-primary.btn-sm(href=`/admisiones/alta/${admision.id}`) Dada de alta
                 a.btn.btn-warning.btn-sm.ms-2(href=`/admisiones/editar/${admision.id}`) Editar
                 form(action=`/admisiones/eliminar/${admision.id}` method="POST" style="display:inline")
                   button.btn.btn-danger.btn-sm.ms-2(type="submit") Eliminar
         else
           tr
-            td.text-center(colspan="7") No hay admisiones registradas
+            td.text-center(colspan="7") No hay admisiones registradas.

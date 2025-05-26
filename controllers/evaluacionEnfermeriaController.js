@@ -18,6 +18,7 @@ exports.formularioNuevaEvaluacion = async (req, res) => {
   try {
     const admisiones = await Admision.findAll({
       where: { estado: "Activo" }, // Solo admisiones activas
+       include: [Paciente]
     });
     res.render("eva_enfermeria/nuevo", { admisiones });
   } catch (error) {

@@ -6,6 +6,7 @@ const Paciente = require('../models/pacienteModel');
 const Cama = require('../models/camaModel');
 const Sala = require('../models/salaModel');
 
+
 // Listar todas las admisiones con datos relacionados
 exports.listarAdmisiones = async (req, res) => {
   try {
@@ -108,17 +109,23 @@ exports.crearAdmision = async (req, res) => {
 // Formulario de edición
 exports.formularioEditarAdmision = async (req, res) => {
   try {
-    const [admision, camas] = await Promise.all([
-      Admision.findByPk(req.params.id, {
-        include: [Paciente, { model: Cama, include: [Sala] }]
-      }),
-      Cama.findAll({ 
-        where: { estado: 'Disponible' },
-        include: [Sala]
-      })
-    ]);
+    const admision = await Admision.findByPk(req.params.id, {
+      include: [Paciente, { model: Cama, include: [Sala] }]
+    });
 
     if (!admision) throw new Error('Admisión no encontrada');
+
+    // Traer camas disponibles + la cama actual de la admisión
+    const camas = await Cama.findAll({
+      where: {
+        [Op.or]: [
+          { estado: 'Disponible' },
+          { id: admision.cama_id }
+        ]
+      },
+      include: [Sala]
+    });
+
     res.render('admisiones/editar', { admision, camas });
   } catch (error) {
     res.render('error', { mensaje: error.message });
@@ -129,37 +136,38 @@ exports.formularioEditarAdmision = async (req, res) => {
 exports.actualizarAdmision = async (req, res) => {
   const t = await sequelize.transaction();
   try {
-    const admision = await Admision.findByPk(req.params.id, { transaction });
+    const admision = await Admision.findByPk(req.params.id, { transaction: t, include: [Paciente, { model: Cama, include: [Sala] }] });
     if (!admision) throw new Error('Admisión no existe');
 
     // Liberar cama anterior
     await Cama.update(
       { estado: 'Disponible' },
-      { where: { id: admision.cama_id }, transaction }
+      { where: { id: admision.cama_id }, transaction: t }
     );
 
     // Actualizar admisión
     await admision.update({
       cama_id: req.body.cama_id,
       tipo_admision: req.body.tipo_admision,
-      estado: req.body.estado,
       motivo: req.body.motivo
-    }, { transaction });
+    }, { transaction: t });
 
     // Ocupar nueva cama
     await Cama.update(
       { estado: 'Ocupada' },
-      { where: { id: req.body.cama_id }, transaction }
+      { where: { id: req.body.cama_id }, transaction: t }
     );
 
     await t.commit();
     res.redirect('/admisiones');
   } catch (error) {
     await t.rollback();
+    // Vuelve a buscar la admisión para mostrar el nombre del paciente
+    const admision = await Admision.findByPk(req.params.id, { include: [Paciente, { model: Cama, include: [Sala] }] });
     const camas = await Cama.findAll({ include: [Sala] });
     res.render('admisiones/editar', {
       error: error.message,
-      admision: req.body,
+      admision,
       camas
     });
   }
@@ -169,20 +177,59 @@ exports.actualizarAdmision = async (req, res) => {
 exports.eliminarAdmision = async (req, res) => {
   const t = await sequelize.transaction();
   try {
-    const admision = await Admision.findByPk(req.params.id, { transaction });
+    const admision = await Admision.findByPk(req.params.id, { transaction: t });
     if (!admision) throw new Error('Admisión no existe');
 
     // Liberar cama
     await Cama.update(
       { estado: 'Disponible' },
-      { where: { id: admision.cama_id }, transaction }
+      { where: { id: admision.cama_id }, transaction: t }
     );
 
-    await admision.destroy({ transaction });
+    await admision.destroy({ transaction: t });
     await t.commit();
     res.redirect('/admisiones');
   } catch (error) {
     await t.rollback();
     res.render('error', { mensaje: 'Error al eliminar' });
+  }
+};
+
+// Volver a activar una admisión dada de alta
+exports.reactivarAdmision = async (req, res) => {
+  const t = await sequelize.transaction();
+  try {
+    const admision = await Admision.findByPk(req.params.id, { transaction: t });
+    if (!admision) throw new Error('Admisión no encontrada');
+    await admision.update({ estado: 'Activo' }, { transaction: t });
+    await t.commit();
+    res.redirect('/admisiones');
+  } catch (error) {
+    await t.rollback();
+    res.render('error', { mensaje: error.message });
+  }
+};
+
+// ALTA
+exports.formularioAlta = async (req, res) => {
+  const admision = await Admision.findByPk(req.params.id, { include: [Paciente] });
+  if (!admision) return res.render('error', { mensaje: 'Admisión no encontrada' });
+  res.render('admisiones/alta', { admision });
+};
+
+exports.darAlta = async (req, res) => {
+  const t = await sequelize.transaction();
+  try {
+    const admision = await Admision.findByPk(req.params.id, { transaction: t });
+    if (!admision) throw new Error('Admisión no encontrada');
+    await admision.update({
+      estado: 'Dados de Alta',
+      motivo: req.body.motivo_alta ? req.body.motivo_alta : admision.motivo
+    }, { transaction: t });
+    await t.commit();
+    res.redirect('/admisiones');
+  } catch (error) {
+    await t.rollback();
+    res.render('error', { mensaje: error.message });
   }
 };
