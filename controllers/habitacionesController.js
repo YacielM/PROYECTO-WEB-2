@@ -1,11 +1,17 @@
-const Sala = require('../models/salaModel');
-const Cama = require('../models/camaModel');
+
+const { Sala, Cama, Admision } = require('../models');
 const sequelize = require("../config/db");
 
 // Listar salas y camas
 exports.listarHabitaciones = async (req, res) => {
-  const salas = await Sala.findAll({ include: [Cama] });
-  res.render('habitaciones/index', { salas });
+  const salas = await Sala.findAll({
+    include: [Cama],
+    order: [
+      ['ala', 'ASC'],
+      ['numero_sala', 'ASC']
+    ]
+  });
+  res.render('habitaciones/index', { salas, error: req.query.error });
 };
 
 // Formulario para nueva sala
@@ -33,13 +39,25 @@ exports.formularioNuevaCama = async (req, res) => {
 
 // Crear cama
 exports.crearCama = async (req, res) => {
+  const sala = await Sala.findByPk(req.body.sala_id, { include: [Cama] });
+  if (sala.Camas.length >= sala.capacidad) {
+    return res.redirect('/habitaciones?error=La capacidad de camas ya está llena en esta sala.');
+  }
   await Cama.create(req.body);
   res.redirect('/habitaciones');
 };
 
 // Eliminar cama
 exports.eliminarCama = async (req, res) => {
-  await Cama.destroy({ where: { id: req.params.id } });
+  const cama = await Cama.findByPk(req.params.id);
+  if (!cama) return res.redirect('/habitaciones');
+  // Verifica si hay una admisión activa en esa cama
+  const admisionActiva = await Admision.findOne({ where: { cama_id: cama.id, estado: 'Activo' } });
+  if (admisionActiva) {
+    // Puedes usar flash o pasar un mensaje por query
+    return res.redirect('/habitaciones?error=No se puede eliminar una cama ocupada por una admisión activa.');
+  }
+  await cama.destroy();
   res.redirect('/habitaciones');
 };
 

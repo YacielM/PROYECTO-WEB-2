@@ -5,9 +5,14 @@ const sequelize = require("../config/db");
 exports.listarEvaluaciones = async (req, res) => {
   try {
     const evaluaciones = await EvaluacionEnfermeria.findAll({
-      include: [Admision],
-      order: [["fecha_evaluacion", "ASC"]],
-    });
+      include: [
+      {
+        model: Admision,
+        include: [Paciente]
+      }
+    ],
+    order: [["fecha_evaluacion", "ASC"]],
+  });
     res.render("eva_enfermeria/index", { evaluaciones });
   } catch (error) {
     res.render("error", { mensaje: "Error al cargar evaluaciones" });

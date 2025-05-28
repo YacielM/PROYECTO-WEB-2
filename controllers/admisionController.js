@@ -226,6 +226,11 @@ exports.darAlta = async (req, res) => {
       estado: 'Dados de Alta',
       motivo: req.body.motivo_alta ? req.body.motivo_alta : admision.motivo
     }, { transaction: t });
+    // Cambiar estado de la cama a "En Limpieza"
+    await Cama.update(
+      { estado: 'En Limpieza' },
+      { where: { id: admision.cama_id }, transaction: t }
+    );
     await t.commit();
     res.redirect('/admisiones');
   } catch (error) {

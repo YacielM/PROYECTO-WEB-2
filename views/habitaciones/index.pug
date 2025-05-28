@@ -2,6 +2,9 @@ extends ../layout.pug
 
 block content
   .container.mt-4
+    if error
+      .alert.alert-danger= error
+    
     h1.text-center Gestión de Habitaciones
     a.btn.btn-success.mb-3(href="/habitaciones/nueva-sala") Nueva Sala
     a.btn.btn-primary.mb-3.ms-2(href="/habitaciones/nueva-cama") Nueva Cama
@@ -30,7 +33,6 @@ block content
                       .card-body
                         h6.card-title Cama #{cama.numero_cama}
                         p Estado: #{cama.estado}
-                        p Restricción de género: #{cama.restriccion_genero}
                         form(action=`/habitaciones/eliminar-cama/${cama.id}` method="POST" style="display:inline")
                           button.btn.btn-danger.btn-sm(type="submit") Eliminar Cama
                         if cama.estado === 'En Limpieza'

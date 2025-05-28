@@ -11,6 +11,7 @@ block content
         thead
           tr
             th Fecha
+            th Paciente
             th Signos Vitales
             th Síntomas
             th Plan de Cuidado
@@ -18,6 +19,7 @@ block content
           each evaluacion in evaluaciones
             tr
               td= evaluacion.fecha_evaluacion ? evaluacion.fecha_evaluacion.toLocaleDateString() : ''
+              td= evaluacion.Admision && evaluacion.Admision.Paciente ? `${evaluacion.Admision.Paciente.nombre} ${evaluacion.Admision.Paciente.apellido}` : 'Sin paciente'
               td= evaluacion.signos_vitales
               td= evaluacion.sintomas
               td= evaluacion.plan_cuidado
