@@ -24,6 +24,14 @@ Cama.init(
     restriccion_genero: {
       type: DataTypes.ENUM('M', 'F', 'Ninguno'),
       defaultValue: 'Ninguno'
+    },
+    sala_id: { 
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'salas',
+        key: 'id'
+      }
     }
   },
   {
@@ -33,11 +41,11 @@ Cama.init(
     indexes: [
       {
         unique: true,
-        fields: ['sala_id', 'numero_cama'] // Evita camas duplicadas en la misma sala
+        fields: ['sala_id', 'numero_cama']
       }
     ],
     defaultScope: {
-      attributes: { exclude: ['createdAt', 'updatedAt'] } // Oculta campos innecesarios
+      attributes: { exclude: ['createdAt', 'updatedAt'] }
     }
   }
 );

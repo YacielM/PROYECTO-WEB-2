@@ -1,10 +1,16 @@
 const Paciente = require('../models/pacienteModel');
 
-// Obtener todos los pacientes
+// Obtener todos los pacientes o buscar por DNI
 exports.obtenerTodos = async (req, res) => {
   try {
-    const pacientes = await Paciente.findAll();
-    res.render('paciente/index', { pacientes });
+    let pacientes;
+    let busqueda = req.query.dni || '';
+    if (busqueda) {
+      pacientes = await Paciente.findAll({ where: { dni: busqueda } });
+    } else {
+      pacientes = await Paciente.findAll();
+    }
+    res.render('paciente/index', { pacientes, busqueda });
   } catch (error) {
     res.status(500).render('error', { mensaje: 'Error al cargar pacientes' });
   }
@@ -18,12 +24,16 @@ exports.mostrarFormularioNuevo = (req, res) => {
 // Insertar nuevo paciente (POST)
 exports.insertar = async (req, res) => {
   try {
-    await Paciente.create(req.body);
+    let datos = req.body;
+    if (!datos.antecedentes || datos.antecedentes.trim() === '') {
+      datos.antecedentes = "Sin antecedentes médicos relevantes";
+    }
+    await Paciente.create(datos);
     res.redirect('/pacientes');
   } catch (error) {
     res.render('paciente/nuevo', { 
       error: 'Error al crear paciente: ' + error.message,
-      datos: req.body // Mantener datos ingresados
+      datos: req.body
     });
   }
 };
@@ -44,7 +54,11 @@ exports.actualizar = async (req, res) => {
   try {
     const paciente = await Paciente.findByPk(req.params.id);
     if (!paciente) throw new Error('Paciente no encontrado');
-    await paciente.update(req.body);
+    let datos = req.body;
+    if (!datos.antecedentes || datos.antecedentes.trim() === '') {
+      datos.antecedentes = "Sin antecedentes médicos relevantes";
+    }
+    await paciente.update(datos);
     res.redirect('/pacientes');
   } catch (error) {
     res.render('paciente/editar', { 
@@ -61,6 +75,17 @@ exports.eliminar = async (req, res) => {
     if (!paciente) throw new Error('Paciente no encontrado');
     await paciente.destroy();
     res.redirect('/pacientes');
+  } catch (error) {
+    res.redirect('/pacientes');
+  }
+};
+
+// Ver antecedentes médicos (GET)
+exports.verAntecedentes = async (req, res) => {
+  try {
+    const paciente = await Paciente.findByPk(req.params.id);
+    if (!paciente) throw new Error('Paciente no encontrado');
+    res.render('paciente/antecedentes', { paciente });
   } catch (error) {
     res.redirect('/pacientes');
   }

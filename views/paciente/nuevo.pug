@@ -6,32 +6,48 @@ block content
     form(action="/pacientes/nuevo" method="POST" class="row g-3")
       div.col-md-6
         label(for="dni" class="form-label") DNI:
-        input(type="text" name="dni" id="dni" class="form-control" required)
+        input(type="text" name="dni" id="dni" class="form-control" required value=datos && datos.dni ? datos.dni : '')
       div.col-md-6
         label(for="nombre" class="form-label") Nombre:
-        input(type="text" name="nombre" id="nombre" class="form-control" required)
+        input(type="text" name="nombre" id="nombre" class="form-control" required value=datos && datos.nombre ? datos.nombre : '')
       div.col-md-6
         label(for="apellido" class="form-label") Apellido:
-        input(type="text" name="apellido" id="apellido" class="form-control" required)
+        input(type="text" name="apellido" id="apellido" class="form-control" required value=datos && datos.apellido ? datos.apellido : '')
       div.col-md-6
         label(for="genero" class="form-label") Género:
         select(name="genero" id="genero" class="form-select" required)
-          option(value="M") Masculino
-          option(value="F") Femenino
-          option(value="O") Otro
+          option(value="M" selected=datos && datos.genero === 'M') Masculino
+          option(value="F" selected=datos && datos.genero === 'F') Femenino
+          option(value="O" selected=datos && datos.genero === 'O') Otro
       div.col-md-12
         label(for="direccion" class="form-label") Dirección:
-        input(type="text" name="direccion" id="direccion" class="form-control")
+        input(type="text" name="direccion" id="direccion" class="form-control" value=datos && datos.direccion ? datos.direccion : '')
       div.col-md-6
         label(for="telefono" class="form-label") Teléfono:
-        input(type="text" name="telefono" id="telefono" class="form-control")
+        input(type="text" name="telefono" id="telefono" class="form-control" value=datos && datos.telefono ? datos.telefono : '')
       div.col-md-6
         label(for="contacto_emergencia" class="form-label") Contacto de Emergencia:
-        input(type="text" name="contacto_emergencia" id="contacto_emergencia" class="form-control")
+        input(type="text" name="contacto_emergencia" id="contacto_emergencia" class="form-control" value=datos && datos.contacto_emergencia ? datos.contacto_emergencia : '')
       div.col-md-12
-        label(for="historial_medico" class="form-label") Historial Médico:
-        textarea(name="historial_medico" id="historial_medico" class="form-control")
+        label.form-label ¿Antecedentes médicos relevantes?
+        select.form-select(name="tiene_antecedentes" id="tiene_antecedentes" required onchange="toggleAntecedentes()")
+          option(value="no" selected=(!datos || !datos.historial_medico || datos.historial_medico === 'Sin antecedentes médicos relevantes')) No
+          option(value="si" selected=(datos && datos.historial_medico && datos.historial_medico !== 'Sin antecedentes médicos relevantes')) Sí
+      div.col-md-12#antecedentesBox(style={display: (!datos || !datos.historial_medico || datos.historial_medico === 'Sin antecedentes médicos relevantes') ? 'none' : 'block'})
+        label(for="historial_medico" class="form-label") Detalle de antecedentes:
+        textarea(name="historial_medico" id="historial_medico" class="form-control")= datos && datos.historial_medico && datos.historial_medico !== 'Sin antecedentes médicos relevantes' ? datos.historial_medico : ''
       div.col-12
         button(type="submit" class="btn btn-success") Guardar
         a.btn.btn-secondary.ms-2(href="/pacientes") Cancelar
-        
+
+  script.
+    function toggleAntecedentes() {
+      var select = document.getElementById('tiene_antecedentes');
+      var box = document.getElementById('antecedentesBox');
+      if (select.value === 'si') {
+        box.style.display = 'block';
+      } else {
+        box.style.display = 'none';
+        document.getElementById('historial_medico').value = '';
+      }
+    }

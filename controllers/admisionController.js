@@ -62,13 +62,47 @@ exports.formularioNuevaAdmision = async (req, res) => {
 
 // Crear nueva admisión (con transacción)
 exports.crearAdmision = async (req, res) => {
-  const t = await sequelize.transaction(); //  Usa la instancia importada
+  const t = await sequelize.transaction();
   try {
     const { paciente_id, cama_id, tipo_admision, motivo } = req.body;
 
-    // Validación
+    // Validación básica
     if (!paciente_id || !cama_id || !tipo_admision) {
       throw new Error('Faltan campos obligatorios');
+    }
+
+    // 1. Obtener la cama y la sala
+    const cama = await Cama.findByPk(cama_id, { include: [Sala] });
+    if (!cama) throw new Error('Cama no encontrada');
+    const sala = cama.Sala;
+
+    // 2. Si la sala tiene capacidad 2, buscar la otra cama ocupada
+    if (sala.capacidad === 2) {
+      // Buscar otra cama ocupada en la misma sala
+      const otraCamaOcupada = await Cama.findOne({
+        where: {
+          sala_id: sala.id,
+          id: { [Op.ne]: cama.id }, // que no sea la misma cama
+          estado: 'Ocupada'
+        }
+      });
+
+      if (otraCamaOcupada) {
+        // Buscar el género del paciente que ocupa la otra cama
+        const admisionOcupante = await Admision.findOne({
+          where: {
+            cama_id: otraCamaOcupada.id,
+            estado: 'Activo'
+          }
+        });
+        if (admisionOcupante) {
+          const pacienteOcupante = await Paciente.findByPk(admisionOcupante.paciente_id);
+          const pacienteNuevo = await Paciente.findByPk(paciente_id);
+          if (pacienteOcupante && pacienteNuevo && pacienteOcupante.genero !== pacienteNuevo.genero) {
+            throw new Error('No se puede asignar esta cama: la otra cama está ocupada por un paciente de género diferente.');
+          }
+        }
+      }
     }
 
     // Crear admisión (con transacción)
@@ -77,20 +111,16 @@ exports.crearAdmision = async (req, res) => {
       cama_id,
       tipo_admision,
       motivo
-    }, { transaction: t }); //  Pasa la transacción
+    }, { transaction: t });
 
     // Actualizar estado de la cama
     await Cama.update(
       { estado: 'Ocupada' },
-      { 
-        where: { id: cama_id }, 
-        transaction: t //  Pasa la transacción
-      }
+      { where: { id: cama_id }, transaction: t }
     );
 
     await t.commit();
     res.redirect('/admisiones');
-    
   } catch (error) {
     await t.rollback();
     const [pacientes, camas] = await Promise.all([

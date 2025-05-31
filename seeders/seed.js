@@ -1,4 +1,3 @@
-// seeders/seed.js
 const sequelize = require('../config/db');
 const Paciente = require('../models/pacienteModel');
 const Sala = require('../models/salaModel');
@@ -15,6 +14,7 @@ async function seed() {
     // 1. Crear Salas
     const salas = await Sala.bulkCreate([
       { ala: 'Norte', numero_sala: '101', capacidad: 2 },
+      { ala: 'Norte', numero_sala: '102', capacidad: 2 },
       { ala: 'Sur', numero_sala: '201', capacidad: 4 },
       { ala: 'Pediatría', numero_sala: '301', capacidad: 3 }
     ]);
@@ -24,18 +24,22 @@ async function seed() {
     const camas = await Cama.bulkCreate([
       // Sala 101 (2 camas)
       { sala_id: salas[0].id, numero_cama: 1, estado: 'Disponible', restriccion_genero: 'Ninguno' },
-      { sala_id: salas[0].id, numero_cama: 2, estado: 'Disponible', restriccion_genero: 'F' },
-      
+      { sala_id: salas[0].id, numero_cama: 2, estado: 'Disponible', restriccion_genero: 'Ninguno' },
+
+      // Sala 102 (2 camas)
+      { sala_id: salas[1].id, numero_cama: 1, estado: 'Ocupada', restriccion_genero: 'Ninguno' },
+      { sala_id: salas[1].id, numero_cama: 2, estado: 'Disponible', restriccion_genero: 'Ninguno' },
+
       // Sala 201 (4 camas)
-      { sala_id: salas[1].id, numero_cama: 1, estado: 'Disponible', restriccion_genero: 'Ninguno' },
-      { sala_id: salas[1].id, numero_cama: 2, estado: 'En Limpieza', restriccion_genero: 'M' },
-      { sala_id: salas[1].id, numero_cama: 3, estado: 'Disponible', restriccion_genero: 'Ninguno' },
-      { sala_id: salas[1].id, numero_cama: 4, estado: 'Ocupada', restriccion_genero: 'Ninguno' },
-      
-      // Sala 301 (3 camas)
       { sala_id: salas[2].id, numero_cama: 1, estado: 'Disponible', restriccion_genero: 'Ninguno' },
-      { sala_id: salas[2].id, numero_cama: 2, estado: 'Disponible', restriccion_genero: 'Ninguno' },
-      { sala_id: salas[2].id, numero_cama: 3, estado: 'Disponible', restriccion_genero: 'Ninguno' }
+      { sala_id: salas[2].id, numero_cama: 2, estado: 'En Limpieza', restriccion_genero: 'Ninguno' },
+      { sala_id: salas[2].id, numero_cama: 3, estado: 'Disponible', restriccion_genero: 'Ninguno' },
+      { sala_id: salas[2].id, numero_cama: 4, estado: 'Ocupada', restriccion_genero: 'Ninguno' },
+
+      // Sala 301 (3 camas)
+      { sala_id: salas[3].id, numero_cama: 1, estado: 'Disponible', restriccion_genero: 'Ninguno' },
+      { sala_id: salas[3].id, numero_cama: 2, estado: 'Disponible', restriccion_genero: 'Ninguno' },
+      { sala_id: salas[3].id, numero_cama: 3, estado: 'Disponible', restriccion_genero: 'Ninguno' }
     ]);
     console.log(' Camas creadas');
 
@@ -46,7 +50,6 @@ async function seed() {
         nombre: 'Carlos',
         apellido: 'Gómez',
         genero: 'M',
-        fecha_nacimiento: '1985-07-15',
         direccion: 'Av. Siempre Viva 742',
         telefono: '555-1234',
         contacto_emergencia: 'María Gómez',
@@ -57,7 +60,6 @@ async function seed() {
         nombre: 'Ana',
         apellido: 'López',
         genero: 'F',
-        fecha_nacimiento: '1992-03-22',
         direccion: 'Calle Falsa 123',
         telefono: '555-5678',
         contacto_emergencia: 'Pedro López',
@@ -68,11 +70,20 @@ async function seed() {
         nombre: 'Luisa',
         apellido: 'Martínez',
         genero: 'F',
-        fecha_nacimiento: '1978-11-30',
         direccion: 'Boulevard Central 456',
         telefono: '555-9012',
         contacto_emergencia: 'Juan Martínez',
         historial_medico: 'Diabetes tipo 2, tratamiento con metformina, retinopatía diabética en control.'
+      },
+      {
+        dni: '12345678',
+        nombre: 'Pedro',
+        apellido: 'Ramírez',
+        genero: 'M',
+        direccion: 'Calle 9 de Julio 100',
+        telefono: '555-2222',
+        contacto_emergencia: 'Lucía Ramírez',
+        historial_medico: 'Sin antecedentes médicos relevantes'
       }
     ]);
     console.log(' Pacientes creados');
@@ -81,14 +92,14 @@ async function seed() {
     const admisiones = await Admision.bulkCreate([
       {
         paciente_id: pacientes[0].id, // Carlos
-        cama_id: camas[3].id, // Cama 2 en Sala 201 (En Limpieza)
+        cama_id: camas[2].id, // Cama 1 en Sala 102 (Ocupada)
         tipo_admision: 'Emergencia',
         estado: 'Activo',
         motivo: 'Dolor torácico agudo'
       },
       {
         paciente_id: pacientes[1].id, // Ana
-        cama_id: camas[6].id, // Cama 1 en Pediatría
+        cama_id: camas[7].id, // Cama 4 en Sala 201 (Ocupada)
         tipo_admision: 'Programada',
         estado: 'Activo',
         motivo: 'Cirugía de vesícula programada'

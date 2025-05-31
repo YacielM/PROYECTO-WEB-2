@@ -1,0 +1,32 @@
+extends ../layout.pug
+
+block content
+  .container.mt-4
+    h2.text-center Detalle del Paciente
+    .card
+      .card-body
+        p
+          b Nombre: 
+          | #{paciente.nombre} #{paciente.apellido}
+        p
+          b DNI: 
+          | #{paciente.dni}
+        p
+          b Género: 
+          | #{paciente.genero}
+        p
+          b Dirección: 
+          | #{paciente.direccion}
+        p
+          b Teléfono: 
+          | #{paciente.telefono}
+        p
+          b Contacto de Emergencia: 
+          | #{paciente.contacto_emergencia}
+        hr
+        h5 Antecedentes médicos:
+        if paciente.historial_medico && paciente.historial_medico !== 'Sin antecedentes médicos relevantes'
+          p= paciente.historial_medico
+        else
+          p Sin antecedentes médicos relevantes
+    a.btn.btn-secondary.mt-3(href="/pacientes") Volver

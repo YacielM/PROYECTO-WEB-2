@@ -8,5 +8,6 @@ router.post('/nuevo', pacienteController.insertar);
 router.get('/editar/:id', pacienteController.mostrarFormularioEditar);
 router.post('/editar/:id', pacienteController.actualizar);
 router.post('/eliminar/:id', pacienteController.eliminar);
+router.get('/antecedentes/:id', pacienteController.verAntecedentes);
 
 module.exports = router;
