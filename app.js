@@ -14,18 +14,37 @@ app.use(express.urlencoded({ extended: true }));
 // Servir archivos estáticos desde la carpeta 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Ruta de ejemplo para renderizar el layout
-app.get('/', (req, res) => {
-  res.render('layout'); // Renderiza el archivo layout.pug
+// Configuración de sesión
+const session = require('express-session');
+app.use(session({
+  secret: '39394014',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { httpOnly: true, maxAge: 60 * 60 * 1000 } // 1 hora
+}));
+
+//Mostrar/Ocultar botones según sesión y rol
+app.use((req, res, next) => {
+  res.locals.session = req.session;
+  next();
 });
-//RUTAS
+
+// Rutas de autenticación (debe ir antes que las rutas protegidas)
+const authRoutes = require('./routes/authRoutes');
+app.use('/', authRoutes);
+
+// Ruta de ejemplo para renderizar el layout o inicio
+app.get('/', (req, res) => {
+  res.render('layout');
+});
+
+// RUTAS principales
 const pacienteRoutes = require('./routes/pacienteRoutes');
 const admisionesRoutes = require('./routes/admisionesRoutes');
 const evaluacionesEnfermeriaRoutes = require('./routes/evaluacionesEnfermeriaRoutes');
 const evaluacionesMedicasRoutes = require ("./routes/evaluacionesMedicasRoutes");
 const habitacionesRoutes = require('./routes/habitacionesRoutes');
 
-// Usar las rutas de pacientes y admisiones
 app.use('/pacientes', pacienteRoutes);
 app.use('/admisiones', admisionesRoutes);
 app.use("/eva_enfermeria", evaluacionesEnfermeriaRoutes);

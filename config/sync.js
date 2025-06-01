@@ -1,6 +1,7 @@
 // sync.js
 const sequelize = require('../config/db');
-const { EvaluacionEnfermeria, EvaluacionMedica, Admision, Paciente, Cama, Sala } = require('../models');
+const { EvaluacionEnfermeria, EvaluacionMedica, Admision,
+   Paciente, Cama, Sala, Usuario } = require('../models');
 
 
 async function syncDB() {

@@ -1,10 +1,7 @@
 const sequelize = require('../config/db');
-const Paciente = require('../models/pacienteModel');
-const Sala = require('../models/salaModel');
-const Cama = require('../models/camaModel');
-const Admision = require('../models/admisionModel');
-const EvaluacionEnfermeria = require('../models/evaluacionEnfermeriaModel');
-const EvaluacionMedica = require('../models/evaluacionMedicaModel');
+const { EvaluacionEnfermeria, EvaluacionMedica, Admision,
+   Paciente, Cama, Sala, Usuario } = require('../models');
+const bcrypt = require('bcrypt');
 
 async function seed() {
   try {
@@ -139,6 +136,29 @@ async function seed() {
         seguimiento: "Retirar puntos en 10 días"
       }
     ]);
+
+    await Usuario.create({
+  usuario: 'admin',
+  contraseña: 'admin123',
+  rol: 'admin'
+});
+await Usuario.create({
+  usuario: 'medico1',
+  contraseña: 'medico123',
+  rol: 'medico'
+});
+await Usuario.create({
+  usuario: 'enfermero1',
+  contraseña: 'enfermero123',
+  rol: 'enfermero'
+});
+await Usuario.create({
+  usuario: 'recepcion1',
+  contraseña: 'recepcion123',
+  rol: 'recepcionista'
+});
+console.log('Usuarios de prueba creados');
+
     console.log(' Evaluaciones médicas creadas');
 
     console.log('¡Datos de prueba insertados exitosamente!');

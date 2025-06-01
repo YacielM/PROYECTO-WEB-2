@@ -5,6 +5,7 @@ const Cama = require('./camaModel');
 const Admision = require('./admisionModel');
 const EvaluacionEnfermeria = require('./evaluacionEnfermeriaModel');
 const EvaluacionMedica = require('./evaluacionMedicaModel');
+const Usuario = require('./usuarioModel');
 
 // Relaciones
 // Admisión -> Paciente y Cama
@@ -51,5 +52,6 @@ module.exports = {
   Cama,
   Admision,
   EvaluacionEnfermeria,
-  EvaluacionMedica 
+  EvaluacionMedica ,
+  Usuario
 };

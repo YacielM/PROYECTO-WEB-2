@@ -4,8 +4,12 @@ block content
   h1.text-center.mt-4 Lista de Pacientes
   div.container.mt-4
     div.d-flex.justify-content-between.mb-3
-      h2.text-start Pacientes Registrados
-      a.btn.btn-success(href="/pacientes/nuevo") Agregar Nuevo Paciente
+      div.d-flex
+        form.d-flex(action="/pacientes" method="GET")
+          input.form-control.me-2(type="text" name="dni" placeholder="Buscar por DNI" value=busqueda)
+          button.btn.btn-primary(type="submit") Buscar
+        a.btn.btn-success.ms-2(href="/pacientes/nuevo") Nuevo Paciente
+        
     table.table.table-striped.table-hover
       thead
         tr
