@@ -71,6 +71,17 @@ exports.crearAdmision = async (req, res) => {
       throw new Error('Faltan campos obligatorios');
     }
 
+    // Validar que el paciente no tenga una admisión activa
+    const admisionActiva = await Admision.findOne({
+      where: {
+        paciente_id,
+        estado: 'Activo'
+      }
+    });
+    if (admisionActiva) {
+      throw new Error('Este paciente ya tiene una admisión activa.');
+    }
+
     // 1. Obtener la cama y la sala
     const cama = await Cama.findByPk(cama_id, { include: [Sala] });
     if (!cama) throw new Error('Cama no encontrada');
@@ -169,9 +180,8 @@ exports.actualizarAdmision = async (req, res) => {
     const admision = await Admision.findByPk(req.params.id, { transaction: t, include: [Paciente, { model: Cama, include: [Sala] }] });
     if (!admision) throw new Error('Admisión no existe');
 
-    // Liberar cama anterior
     await Cama.update(
-      { estado: 'Disponible' },
+      { estado: 'En Limpieza' },
       { where: { id: admision.cama_id }, transaction: t }
     );
 
@@ -232,6 +242,11 @@ exports.reactivarAdmision = async (req, res) => {
     const admision = await Admision.findByPk(req.params.id, { transaction: t });
     if (!admision) throw new Error('Admisión no encontrada');
     await admision.update({ estado: 'Activo' }, { transaction: t });
+    // Cambiar estado de la cama a "Ocupada"
+    await Cama.update(
+      { estado: 'Ocupada' },
+      { where: { id: admision.cama_id }, transaction: t }
+    );
     await t.commit();
     res.redirect('/admisiones');
   } catch (error) {

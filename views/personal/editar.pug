@@ -1,0 +1,33 @@
+//- views/personal/editar.pug
+extends ../layout.pug
+
+block content
+  .container.mt-4
+    h2 Editar Personal
+    if error
+      .alert.alert-danger= error
+    form(action=`/personal/editar/${usuario.id}` method="POST")
+      .mb-3
+        label.form-label(for="usuario") Usuario
+        input.form-control(type="text" name="usuario" required value=usuario.usuario)
+      .mb-3
+        label.form-label(for="rol") Rol
+        select.form-select(name="rol" required)
+          option(value="admin" selected=usuario.rol==='admin') Administrador
+          option(value="medico" selected=usuario.rol==='medico') Médico
+          option(value="enfermero" selected=usuario.rol==='enfermero') Enfermero
+          option(value="recepcionista" selected=usuario.rol==='recepcionista') Recepcionista
+      .mb-3
+        label.form-label(for="nombre") Nombre
+        input.form-control(type="text" name="nombre" required value=usuario.nombre)
+      .mb-3
+        label.form-label(for="apellido") Apellido
+        input.form-control(type="text" name="apellido" required value=usuario.apellido)
+      .mb-3
+        label.form-label(for="email") Email
+        input.form-control(type="email" name="email" value=usuario.email)
+      .mb-3
+        label.form-label(for="telefono") Teléfono
+        input.form-control(type="text" name="telefono" value=usuario.telefono)
+      button.btn.btn-primary(type="submit") Actualizar
+      a.btn.btn-secondary.ms-2(href="/personal") Cancelar

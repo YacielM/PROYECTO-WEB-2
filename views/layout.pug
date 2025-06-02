@@ -32,6 +32,9 @@ html(lang="es")
                     a.nav-link(href="/eva_medicas") Evaluaciones Médicas
                 li.nav-item
                   a.nav-link(href="/habitaciones") Habitaciones
+                if session.rol === 'admin'
+                  li.nav-item 
+                    a.nav-link(href="/personal") Personal
               else
                 // Si no hay sesión, solo muestra Inicio y (opcional) Pacientes
                 li.nav-item

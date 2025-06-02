@@ -140,22 +140,38 @@ async function seed() {
     await Usuario.create({
   usuario: 'admin',
   contraseña: 'admin123',
-  rol: 'admin'
+  rol: 'admin',
+  nombre: 'Yaciel Maximiliano',
+  apellido: 'Muñoz',
+  email: 'yacielzombers@gmail.com',
+  telefono: '02664256205'
 });
 await Usuario.create({
   usuario: 'medico1',
   contraseña: 'medico123',
-  rol: 'medico'
+  rol: 'medico',
+  nombre: 'Gregory',
+  apellido: 'House',
+  email: 'doctorhouse@gmail.com',
+  telefono: '02665768933'
 });
 await Usuario.create({
   usuario: 'enfermero1',
   contraseña: 'enfermero123',
-  rol: 'enfermero'
+  rol: 'enfermero',
+  nombre: 'Robert',
+  apellido: 'Chase',
+  email: 'doctorchase@gmail.com',
+  telefono: '02664744931'
 });
 await Usuario.create({
   usuario: 'recepcion1',
   contraseña: 'recepcion123',
-  rol: 'recepcionista'
+  rol: 'recepcionista',
+  nombre: 'Gordon',
+  apellido: 'Freeman',
+  email: 'gordonfreeman@gmail.com',
+  telefono: '02664666332'
 });
 console.log('Usuarios de prueba creados');
 

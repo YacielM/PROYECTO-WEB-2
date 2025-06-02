@@ -1,0 +1,36 @@
+//- views/personal/nuevo.pug
+extends ../layout.pug
+
+block content
+  .container.mt-4
+    h2 Nuevo Personal
+    if error
+      .alert.alert-danger= error
+    form(action="/personal/nuevo" method="POST")
+      .mb-3
+        label.form-label(for="usuario") Usuario
+        input.form-control(type="text" name="usuario" required)
+      .mb-3
+        label.form-label(for="contraseña") Contraseña
+        input.form-control(type="password" name="contraseña" required)
+      .mb-3
+        label.form-label(for="rol") Rol
+        select.form-select(name="rol" required)
+          option(value="admin") Administrador
+          option(value="medico") Médico
+          option(value="enfermero") Enfermero
+          option(value="recepcionista") Recepcionista
+      .mb-3
+        label.form-label(for="nombre") Nombre
+        input.form-control(type="text" name="nombre" required)
+      .mb-3
+        label.form-label(for="apellido") Apellido
+        input.form-control(type="text" name="apellido" required)
+      .mb-3
+        label.form-label(for="email") Email
+        input.form-control(type="email" name="email")
+      .mb-3
+        label.form-label(for="telefono") Teléfono
+        input.form-control(type="text" name="telefono")
+      button.btn.btn-success(type="submit") Guardar
+      a.btn.btn-secondary.ms-2(href="/personal") Cancelar

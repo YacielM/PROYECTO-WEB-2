@@ -22,7 +22,22 @@ Usuario.init({
     type: DataTypes.ENUM('admin', 'medico',
          'enfermero', 'recepcionista'),
     allowNull: false
+  },
+  nombre: { 
+    type: DataTypes.STRING,
+    allowNull: false 
+  },
+  apellido: { 
+    type: DataTypes.STRING, 
+    allowNull: false 
+  },
+  email: { 
+    type: DataTypes.STRING 
+  },
+  telefono: { 
+    type: DataTypes.STRING 
   }
+
 }, {
   sequelize,
   modelName: 'Usuario',

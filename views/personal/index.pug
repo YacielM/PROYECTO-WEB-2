@@ -1,0 +1,28 @@
+extends ../layout.pug
+
+block content
+  h2 Personal del Hospital
+  a.btn.btn-success(href="/personal/nuevo") Nuevo Personal
+  table.table.table-striped
+    thead
+      tr
+        th Usuario
+        th Nombre
+        th Apellido
+        th Rol
+        th Email
+        th Teléfono
+        th Acciones
+    tbody
+      each p in personal
+        tr
+          td= p.usuario
+          td= p.nombre
+          td= p.apellido
+          td= p.rol
+          td= p.email
+          td= p.telefono
+          td
+            a.btn.btn-warning.btn-sm(href=`/personal/editar/${p.id}`) Editar
+            form(action=`/personal/eliminar/${p.id}` method="POST" style="display:inline")
+              button.btn.btn-danger.btn-sm.ms-2(type="submit") Eliminar
