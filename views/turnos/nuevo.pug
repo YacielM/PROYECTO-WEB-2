@@ -1,0 +1,26 @@
+//- views/turnos/nuevo.pug
+extends ../layout.pug
+
+block content
+  h2 Nuevo Turno
+  if error
+    .alert.alert-danger= error
+  form(action="/turnos/nuevo" method="POST")
+    .mb-3
+      label.form-label(for="fecha") Fecha y Hora
+      input.form-control(type="datetime-local" name="fecha" required)
+    .mb-3
+      label.form-label(for="paciente_id") Paciente
+      select.form-select(name="paciente_id" required)
+        each p in pacientes
+          option(value=p.id)= p.nombre + ' ' + p.apellido
+    .mb-3
+      label.form-label(for="medico_id") Médico
+      select.form-select(name="medico_id" required)
+        each m in medicos
+          option(value=m.id)= m.nombre + ' ' + m.apellido
+    .mb-3
+      label.form-label(for="motivo") Motivo
+      input.form-control(type="text" name="motivo")
+    button.btn.btn-success(type="submit") Guardar
+    a.btn.btn-secondary.ms-2(href="/turnos") Cancelar

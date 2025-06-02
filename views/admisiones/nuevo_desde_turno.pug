@@ -1,0 +1,20 @@
+extends ../layout.pug
+
+block content
+  .container.mt-4
+    h2 Nueva Admisión para #{paciente.nombre} #{paciente.apellido}
+    if error
+      .alert.alert-danger= error
+    form(action=`/admisiones/nuevo_desde_turno/${turno.id}` method="POST")
+      input(type="hidden" name="paciente_id" value=paciente.id)
+      .mb-3
+        label.form-label(for="cama_id") Cama
+        select.form-select(name="cama_id" required)
+          each c in camas
+            option(value=c.id)= `Cama ${c.numero_cama} - Sala ${c.Sala.numero_sala} (${c.Sala.ala})`
+           
+      .mb-3
+        label.form-label(for="motivo") Motivo
+        input.form-control(type="text" name="motivo" required)
+      button.btn.btn-success(type="submit") Admitir
+      a.btn.btn-secondary.ms-2(href="/turnos") Cancelar

@@ -1,9 +1,6 @@
 // models/admisionModel.js
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
-const Paciente = require("./pacienteModel");
-const Cama = require("./camaModel");
-const EvaluacionEnfermeria = require("./evaluacionEnfermeriaModel");
 
 class Admision extends Model {}
 
@@ -28,7 +25,7 @@ Admision.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Paciente,
+        model: "pacientes",
         key: "id",
       },
     },
@@ -36,7 +33,7 @@ Admision.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Cama,
+        model: "camas",
         key: "id",
       },
     },
@@ -51,12 +48,5 @@ Admision.init(
   }
 );
 
-// Relaciones
-Admision.belongsTo(Paciente, { foreignKey: "paciente_id" });
-Admision.belongsTo(Cama, { foreignKey: "cama_id" });
-
-// Una admisión puede tener múltiples evaluaciones de enfermería
-Admision.hasMany(EvaluacionEnfermeria, {
-  foreignKey: "admision_id" });
 
 module.exports = Admision;

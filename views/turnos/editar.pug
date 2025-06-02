@@ -1,0 +1,26 @@
+//- views/turnos/editar.pug
+extends ../layout.pug
+
+block content
+  h2 Editar Turno
+  if error
+    .alert.alert-danger= error
+  form(action=`/turnos/editar/${turno.id}` method="POST")
+    .mb-3
+      label.form-label(for="fecha") Fecha y Hora
+      input.form-control(type="datetime-local" name="fecha" required value=turno.fecha.toISOString().slice(0,16))
+    .mb-3
+      label.form-label(for="paciente_id") Paciente
+      select.form-select(name="paciente_id" required)
+        each p in pacientes
+          option(value=p.id selected=turno.paciente_id==p.id)= p.nombre + ' ' + p.apellido
+    .mb-3
+      label.form-label(for="medico_id") Médico
+      select.form-select(name="medico_id" required)
+        each m in medicos
+          option(value=m.id selected=turno.medico_id==m.id)= m.nombre + ' ' + m.apellido
+    .mb-3
+      label.form-label(for="motivo") Motivo
+      input.form-control(type="text" name="motivo" value=turno.motivo)
+    button.btn.btn-primary(type="submit") Actualizar
+    a.btn.btn-secondary.ms-2(href="/turnos") Cancelar

@@ -26,4 +26,8 @@ router.post('/alta/:id',estaAutenticado, tieneRol(['admin', 'recepcionista']), a
 router.post('/reactivar/:id',estaAutenticado, tieneRol(['admin', 'recepcionista']), admisionController.reactivarAdmision);
 router.post('/reactivar/:id',estaAutenticado, tieneRol(['admin', 'recepcionista']), admisionController.reactivarAdmision);
 
+//Crear admision desde turno
+router.get('/nuevo_desde_turno/:turnoId', estaAutenticado, tieneRol(['admin', 'medico', 'recepcionista']), admisionController.formularioDesdeTurno);
+router.post('/nuevo_desde_turno/:turnoId', estaAutenticado, tieneRol(['admin', 'medico', 'recepcionista']), admisionController.crearDesdeTurno);
+
 module.exports = router;

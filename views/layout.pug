@@ -35,6 +35,9 @@ html(lang="es")
                 if session.rol === 'admin'
                   li.nav-item 
                     a.nav-link(href="/personal") Personal
+                if session.rol === 'admin' || session.rol === 'recepcionista' || session.rol === 'medico'
+                  li.nav-item
+                    a.nav-link(href="/turnos") Turnos
               else
                 // Si no hay sesión, solo muestra Inicio y (opcional) Pacientes
                 li.nav-item

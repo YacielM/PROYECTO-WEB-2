@@ -1,10 +1,7 @@
 // controllers/admisionController.js
-const { Op } = require('sequelize');
+
 const sequelize = require('../config/db');
-const Admision = require('../models/admisionModel');
-const Paciente = require('../models/pacienteModel');
-const Cama = require('../models/camaModel');
-const Sala = require('../models/salaModel');
+const { Admision, Paciente, Cama, Sala, Turno } = require('../models');
 
 
 // Listar todas las admisiones con datos relacionados
@@ -156,16 +153,11 @@ exports.formularioEditarAdmision = async (req, res) => {
 
     if (!admision) throw new Error('Admisión no encontrada');
 
-    // Traer camas disponibles + la cama actual de la admisión
-    const camas = await Cama.findAll({
-      where: {
-        [Op.or]: [
-          { estado: 'Disponible' },
-          { id: admision.cama_id }
-        ]
-      },
-      include: [Sala]
-    });
+    // Traer camas disponibles + la cama actual de la admisión (sin Op)
+  const todasCamas = await Cama.findAll({ include: [Sala] });
+  const camas = todasCamas.filter(c =>
+  c.estado === 'Disponible' || c.id === admision.cama_id
+  );
 
     res.render('admisiones/editar', { admision, camas });
   } catch (error) {
@@ -281,5 +273,60 @@ exports.darAlta = async (req, res) => {
   } catch (error) {
     await t.rollback();
     res.render('error', { mensaje: error.message });
+  }
+};
+
+// Mostrar formulario de admisión con paciente ya seleccionado
+exports.formularioDesdeTurno = async (req, res) => {
+  const turno = await Turno.findByPk(req.params.turnoId, { include: [Paciente] });
+  const camas = await Cama.findAll({
+  where: { estado: 'Disponible' },
+  include: [Sala]
+});
+  res.render('admisiones/nuevo_desde_turno', { paciente: turno.Paciente, camas, turno });
+};
+
+// Crear admisión desde turno
+exports.crearDesdeTurno = async (req, res) => {
+  try {
+    // Validar que el paciente no tenga una admisión activa
+    const admisionActiva = await Admision.findOne({
+      where: {
+        paciente_id: req.body.paciente_id,
+        estado: 'Activo'
+      }
+    });
+    if (admisionActiva) {
+      throw new Error('Este paciente ya tiene una admisión activa.');
+    }
+
+    await Admision.create({
+      paciente_id: req.body.paciente_id,
+      cama_id: req.body.cama_id,
+      tipo_admision: 'Programada',
+      motivo: req.body.motivo,
+      estado: 'Activo'
+    });
+    await Cama.update({ estado: 'Ocupada' }, { where: { id: req.body.cama_id } });
+
+    // Cambiar estado del turno a "internacion_pendiente"
+    await Turno.update(
+      { estado: 'internacion_pendiente' },
+      { where: { id: req.params.turnoId } }
+    );
+
+    res.redirect('/admisiones');
+  } catch (error) {
+    const turno = await Turno.findByPk(req.params.turnoId, { include: [Paciente] });
+    const camas = await Cama.findAll({
+      where: { estado: 'Disponible' },
+      include: [Sala]
+    });
+    res.render('admisiones/nuevo_desde_turno', {
+      error: error.message,
+      paciente: turno ? turno.Paciente : null,
+      camas,
+      turno
+    });
   }
 };
