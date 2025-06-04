@@ -10,7 +10,11 @@ exports.obtenerTodos = async (req, res) => {
     } else {
       pacientes = await Paciente.findAll();
     }
-    res.render('paciente/index', { pacientes, busqueda });
+    res.render('paciente/index', {
+    pacientes,
+    busqueda: req.query.dni || '',
+    activePage: 'pacientes-gestion'
+  });
   } catch (error) {
     res.status(500).render('error', { mensaje: 'Error al cargar pacientes' });
   }
@@ -90,3 +94,4 @@ exports.verAntecedentes = async (req, res) => {
     res.redirect('/pacientes');
   }
 };
+

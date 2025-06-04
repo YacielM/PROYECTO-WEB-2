@@ -1,15 +1,19 @@
 extends ../layout.pug
+block pageTitle
+  | Formulario de Inicio de Sesión
 
 block content
   .container.mt-5
-    h2.text-center Iniciar Sesión
-    if error
-      .alert.alert-danger= error
-    form(action="/login" method="POST" class="mx-auto" style="max-width:400px")
-      .mb-3
-        label.form-label(for="usuario") Usuario:
-        input.form-control(type="text" name="usuario" required)
-      .mb-3
-        label.form-label(for="contraseña") Contraseña:
-        input.form-control(type="password" name="contraseña" required)
-      button.btn.btn-primary(type="submit") Ingresar
+  .d-flex.justify-content-center.align-items-center(style="min-height:70vh;")
+    .card.shadow.p-4(style="min-width:350px;max-width:400px;")
+      h2.text-center Iniciar Sesión
+      if error
+        .alert.alert-danger= error
+      form(action="/login" method="POST" class="mx-auto" style="max-width:400px")
+        .mb-3
+          label.form-label(for="usuario") Usuario:
+          input.form-control(type="text" name="usuario" required)
+        .mb-3
+          label.form-label(for="contraseña") Contraseña:
+          input.form-control(type="password" name="contraseña" required)
+        button.btn.btn-primary(type="submit") Ingresar

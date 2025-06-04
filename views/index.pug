@@ -1,15 +1,13 @@
 extends layout.pug
 
 block content
-if error
-  .alert.alert-danger= error
-  h1 Sistema Hospitalario HIS
-  p Bienvenido al sistema de gestión hospitalaria. Seleccione una de las opciones para comenzar.
-  
-  div.menu
-    ul
-      li: a(href="/pacientes") Gestión de Pacientes
-      li: a(href="/admisiones") Gestión de Admisiones
-      li: a(href="/eva_enfermeria") Evaluaciones de Enfermería
-      li: a(href="/eva_medicas") Evaluaciones Médicas
-      li: a(href="/habitaciones") Gestión de Habitaciones
+  h2.mb-4 Bienvenido #{session && session.nombre ? session.nombre : 'al sistema'}
+  if session && session.rol
+    p.text-muted.mb-4
+      | Rol: #{session.rol === 'medico' ? 'Dr.' : ''} #{session.rol}
+  h4 Mensajes
+  //- Aquí puedes iterar sobre mensajes importantes
+  each mensaje in mensajes
+    .card.card-message.p-3
+      h5.mb-1= mensaje.titulo
+      p.mb-0= mensaje.texto

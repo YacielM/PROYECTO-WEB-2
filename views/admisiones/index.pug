@@ -1,39 +1,45 @@
 extends ../layout.pug
 
+block pageTitle
+  | Gestión de Admisiones
+
 block content
-  h1.text-center.mt-4 Lista de Admisiones
-  div.container.mt-4
-    div.d-flex.justify-content-end.mb-3
-      a.btn.btn-success(href="/admisiones/nuevo") Nueva Admisión
-    table.table.table-striped.table-hover
-      thead
-        tr
-          th ID
-          th Paciente
-          th Fecha Admisión
-          th Tipo
-          th Estado
-          th Cama
-          th Acciones
-      tbody
-        if admisiones.length > 0
-          each admision in admisiones
-            tr
-              td= admision.id
-              td= admision.paciente
-              td= admision.fecha_admision
-              td= admision.tipo_admision
-              td= admision.estado
-              td= admision.cama
-              td
-                if admision.estado === 'Dados de Alta'
-                  form(action=`/admisiones/reactivar/${admision.id}` method="POST" style="display:inline")
-                    button.btn.btn-success.btn-sm(type="submit") Reactivar
-                else
-                  a.btn.btn-primary.btn-sm(href=`/admisiones/alta/${admision.id}`) Dada de alta
-                a.btn.btn-warning.btn-sm.ms-2(href=`/admisiones/editar/${admision.id}`) Editar
-                form(action=`/admisiones/eliminar/${admision.id}` method="POST" style="display:inline")
-                  button.btn.btn-danger.btn-sm.ms-2(type="submit") Eliminar
-        else
-          tr
-            td.text-center(colspan="7") No hay admisiones registradas.
+  .container
+    .card.shadow.mb-4
+      .card-body
+        h1.text-center.mt-4 Lista de Admisiones
+        div.container.mt-4
+          div.d-flex.justify-content-end.mb-3
+            a.btn.btn-success(href="/admisiones/nuevo") Nueva Admisión
+          table.table.table-striped.table-hover
+            thead
+              tr
+                th ID
+                th Paciente
+                th Fecha Admisión
+                th Tipo
+                th Estado
+                th Cama
+                th Acciones
+            tbody
+              if admisiones.length > 0
+                each admision in admisiones
+                  tr
+                    td= admision.id
+                    td= admision.paciente
+                    td= admision.fecha_admision
+                    td= admision.tipo_admision
+                    td= admision.estado
+                    td= admision.cama
+                    td
+                      if admision.estado === 'Dados de Alta'
+                        form(action=`/admisiones/reactivar/${admision.id}` method="POST" style="display:inline")
+                          button.btn.btn-success.btn-sm(type="submit") Reactivar
+                      else
+                        a.btn.btn-primary.btn-sm(href=`/admisiones/alta/${admision.id}`) Dada de alta
+                      a.btn.btn-warning.btn-sm.ms-2(href=`/admisiones/editar/${admision.id}`) Editar
+                      form(action=`/admisiones/eliminar/${admision.id}` method="POST" style="display:inline")
+                        button.btn.btn-danger.btn-sm.ms-2(type="submit") Eliminar
+              else
+                tr
+                  td.text-center(colspan="7") No hay admisiones registradas.

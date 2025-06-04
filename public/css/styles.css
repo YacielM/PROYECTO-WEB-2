@@ -1,0 +1,38 @@
+body, html {
+  background: #f8f9fa;
+}
+.bg-sidebar {
+  background: #f3f4f6 !important;
+}
+#sidebar, .bg-sidebar {
+  border-right: 1.5px solid #e0e3e7;
+}
+#sidebar .nav-link {
+  color: #333;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+#sidebar .nav-link.active, #sidebar .nav-link:hover {
+  background: #e2e2de;
+  color: #0d6efd;
+}
+#sidebar .collapse .nav-link {
+  font-size: 0.98em;
+  padding-left: 2rem;
+}
+.border-bottom {
+  border-bottom: 1.5px solid #e0e3e7 !important;
+}
+.card-message {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 1rem;
+  background: #fff;
+  border: 1px solid #e0e3e7;
+}
+@media (max-width: 767px) {
+  #sidebar {
+    display: none !important;
+  }
+}

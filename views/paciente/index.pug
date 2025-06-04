@@ -1,44 +1,48 @@
 extends ../layout.pug
 
+block pageTitle
+  | Gestión de Pacientes
+
 block content
-  h1.text-center.mt-4 Lista de Pacientes
-  div.container.mt-4
-    div.d-flex.justify-content-between.mb-3
-      div.d-flex
-        form.d-flex(action="/pacientes" method="GET")
-          input.form-control.me-2(type="text" name="dni" placeholder="Buscar por DNI" value=busqueda)
-          button.btn.btn-primary(type="submit") Buscar
-        a.btn.btn-success.ms-2(href="/pacientes/nuevo") Nuevo Paciente
-        
-    table.table.table-striped.table-hover
-      thead
-        tr
-          th DNI
-          th Nombre
-          th Apellido
-          th Género
-          th Teléfono
-          th Historial Médico
-          th Acciones
-      tbody
-        if pacientes.length > 0
-          each paciente in pacientes
+  .container
+    .card.shadow.mb-4
+      .card-body
+        h2.mb-3 Lista de Pacientes
+        div.d-flex.justify-content-between.mb-3
+          form.d-flex(action="/pacientes" method="GET")
+            input.form-control.me-2(type="text" name="dni" placeholder="Buscar por DNI" value=busqueda)
+            button.btn.btn-primary(type="submit") Buscar
+          a.btn.btn-success.ms-2(href="/pacientes/nuevo") Nuevo Paciente
+        table.table.table-striped.table-hover
+          thead
             tr
-              td= paciente.dni
-              td= paciente.nombre
-              td= paciente.apellido
-              td= paciente.genero
-              td= paciente.telefono
-              td
-                if paciente.historial_medico && paciente.historial_medico !== 'Sin antecedentes médicos relevantes'
-                  span.text-dark Con antecedentes médicos relevantes
-                else
-                  span.text-dark Sin antecedentes médicos relevantes
-              td
-                a.btn.btn-primary.btn-sm(href=`/pacientes/antecedentes/${paciente.id}`) Ver
-                a.btn.btn-warning.btn-sm.ms-2(href=`/pacientes/editar/${paciente.id}`) Editar
-                form(action=`/pacientes/eliminar/${paciente.id}` method="POST" style="display:inline")
-                  button.btn.btn-danger.btn-sm.ms-2(type="submit") Eliminar
-        else
-          tr
-            td.text-center(colspan="9") No hay pacientes registrados
+              th DNI
+              th Nombre
+              th Apellido
+              th Género
+              th Teléfono
+              th Historial Médico
+              th Acciones
+          tbody
+            if pacientes.length > 0
+              each paciente in pacientes
+                tr
+                  td= paciente.dni
+                  td= paciente.nombre
+                  td= paciente.apellido
+                  td= paciente.genero
+                  td= paciente.telefono
+                  td
+                    if paciente.historial_medico && paciente.historial_medico !== 'Sin antecedentes médicos relevantes'
+                      span.text-dark Con antecedentes médicos relevantes
+                    else
+                      span.text-dark Sin antecedentes médicos relevantes
+                  td
+                    a.btn.btn-primary.btn-sm(href=`/pacientes/antecedentes/${paciente.id}`) Ver
+                    a.btn.btn-warning.btn-sm.ms-2(href=`/pacientes/editar/${paciente.id}`) Editar
+                    form(action=`/pacientes/eliminar/${paciente.id}` method="POST" style="display:inline")
+                      button.btn.btn-danger.btn-sm.ms-2(type="submit") Eliminar
+            else
+              tr
+                td.text-center(colspan="9") No hay pacientes registrados
+                

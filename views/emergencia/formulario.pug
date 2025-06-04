@@ -1,0 +1,23 @@
+extends ../layout.pug
+
+block pageTitle
+  | Emergencia - Asignar cama
+
+block content
+  .d-flex.justify-content-center.align-items-center(style="min-height:70vh;")
+    .card.shadow.p-4(style="min-width:350px;max-width:400px;")
+      h4.text-center.text-danger.mb-4 Emergencia - Asignar cama
+      if error
+        .alert.alert-danger= error
+      form(action="/emergencia" method="POST")
+        .mb-3
+          label.form-label(for="motivo") Motivo de la emergencia:
+          textarea.form-control(name="motivo" required rows="3")
+        //- Puedes pedir más datos si quieres, como nombre, apellido, etc.
+        .mb-3
+          label.form-label(for="nombre") Nombre del paciente (opcional):
+          input.form-control(type="text" name="nombre")
+        .mb-3
+          label.form-label(for="apellido") Apellido del paciente (opcional):
+          input.form-control(type="text" name="apellido")
+        button.btn.btn-danger.w-100.mt-3(type="submit") Registrar y asignar cama de emergencia

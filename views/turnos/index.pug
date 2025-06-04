@@ -1,41 +1,46 @@
-//- views/turnos/index.pug
 extends ../layout.pug
 
+block pageTitle
+  | Gestión de Turnos
+
 block content
-  h2 Turnos
-  if session.rol === 'admin' || session.rol === 'recepcionista'
-    a.btn.btn-success(href="/turnos/nuevo") Nuevo Turno
-  table.table.table-striped.mt-3
-    thead
-      tr
-        th Fecha
-        th Paciente
-        th Médico
-        th Motivo
-        th Estado
-        th Acciones
-    tbody
-      each t in turnos
-        tr
-          td= t.fecha.toLocaleString()
-          td= t.Paciente ? t.Paciente.nombre + ' ' + t.Paciente.apellido : ''
-          td= t.medico ? t.medico.nombre + ' ' + t.medico.apellido : ''
-          td= t.motivo
-          td= t.estado
-          td
-            if session.rol === 'admin' || session.rol === 'recepcionista'
-              a.btn.btn-warning.btn-sm(href=`/turnos/editar/${t.id}`) Editar
-              form(action=`/turnos/eliminar/${t.id}` method="POST" style="display:inline")
-                button.btn.btn-danger.btn-sm.ms-2(type="submit") Eliminar
-            if t.estado === 'pendiente' && (session.rol === 'admin' || session.rol === 'recepcionista' || session.rol === 'medico')
-              form(action=`/turnos/estado/${t.id}` method="POST" style="display:inline")
-                input(type="hidden" name="estado" value="atendido")
-                button.btn.btn-success.btn-sm.ms-2(type="submit") Atender
-              form(action=`/turnos/estado/${t.id}` method="POST" style="display:inline")
-                input(type="hidden" name="estado" value="cancelado")
-                button.btn.btn-secondary.btn-sm.ms-2(type="submit") Cancelar
-            // Mostrar botón Internar si el turno está atendido y el paciente no tiene admisión activa
-            if t.estado === 'atendido' && !t.Paciente.tieneAdmisionActiva && t.estado !== 'internacion_pendiente'
-              a.btn.btn-primary.btn-sm.ms-2(href=`/admisiones/nuevo_desde_turno/${t.id}`) Internar
-            else if t.estado === 'internacion_pendiente'
-                span.badge.bg-info.ms-2 Se mandó a internar
+  .container
+    .card.shadow.mb-4
+      .card-body
+        h2 Turnos
+        if session.rol === 'admin' || session.rol === 'recepcionista'
+          a.btn.btn-success(href="/turnos/nuevo") Nuevo Turno
+        table.table.table-striped.mt-3
+          thead
+            tr
+              th Fecha
+              th Paciente
+              th Médico
+              th Motivo
+              th Estado
+              th Acciones
+          tbody
+            each t in turnos
+              tr
+                td= t.fecha.toLocaleString()
+                td= t.Paciente ? t.Paciente.nombre + ' ' + t.Paciente.apellido : ''
+                td= t.medico ? t.medico.nombre + ' ' + t.medico.apellido : ''
+                td= t.motivo
+                td= t.estado
+                td
+                  if session.rol === 'admin' || session.rol === 'recepcionista'
+                    a.btn.btn-warning.btn-sm(href=`/turnos/editar/${t.id}`) Editar
+                    form(action=`/turnos/eliminar/${t.id}` method="POST" style="display:inline")
+                      button.btn.btn-danger.btn-sm.ms-2(type="submit") Eliminar
+                  if t.estado === 'pendiente' && (session.rol === 'admin' || session.rol === 'recepcionista' || session.rol === 'medico')
+                    form(action=`/turnos/estado/${t.id}` method="POST" style="display:inline")
+                      input(type="hidden" name="estado" value="atendido")
+                      button.btn.btn-success.btn-sm.ms-2(type="submit") Atender
+                    form(action=`/turnos/estado/${t.id}` method="POST" style="display:inline")
+                      input(type="hidden" name="estado" value="cancelado")
+                      button.btn.btn-secondary.btn-sm.ms-2(type="submit") Cancelar
+                  // Mostrar botón Internar si el turno está atendido y el paciente no tiene admisión activa
+                  if t.estado === 'atendido' && !t.Paciente.tieneAdmisionActiva && t.estado !== 'internacion_pendiente'
+                    a.btn.btn-primary.btn-sm.ms-2(href=`/admisiones/nuevo_desde_turno/${t.id}`) Internar
+                  else if t.estado === 'internacion_pendiente'
+                      span.badge.bg-info.ms-2 Se mandó a internar

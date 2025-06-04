@@ -1,0 +1,12 @@
+extends ../layout.pug
+
+block pageTitle
+  | Emergencia registrada
+
+block content
+  .d-flex.justify-content-center.align-items-center(style="min-height:70vh;")
+    .card.shadow.p-4(style="min-width:350px;max-width:400px;")
+      h4.text-success.text-center.mb-3 ¡Emergencia registrada!
+      p.mb-2 Paciente: #{paciente.nombre} #{paciente.apellido}
+      p.mb-2 Cama asignada: #{cama.numero_cama}
+      a.btn.btn-primary.mt-3(href="/") Volver al inicio

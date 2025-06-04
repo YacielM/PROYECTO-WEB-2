@@ -46,6 +46,7 @@ const evaluacionesMedicasRoutes = require ("./routes/evaluacionesMedicasRoutes")
 const habitacionesRoutes = require('./routes/habitacionesRoutes');
 const personalRoutes = require('./routes/personalRoutes');
 const turnosRoutes = require('./routes/turnosRoutes');
+const emergenciaRoutes = require('./routes/emergenciaRoutes');
 
 app.use('/pacientes', pacienteRoutes);
 app.use('/admisiones', admisionesRoutes);
@@ -54,6 +55,7 @@ app.use("/eva_medicas", evaluacionesMedicasRoutes);
 app.use('/habitaciones', habitacionesRoutes);
 app.use('/personal', personalRoutes);
 app.use('/turnos', turnosRoutes);
+app.use('/emergencia', emergenciaRoutes);
 
 // Después de las rutas
 app.use((err, req, res, next) => {
