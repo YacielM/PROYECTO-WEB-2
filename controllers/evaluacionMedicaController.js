@@ -61,3 +61,73 @@ exports.crearEvaluacion = async (req, res) => {
     });
   }
 };
+
+// Función para mostrar el detalle de una evaluación médica
+exports.detalleEvaluacion = async (req, res) => {
+  try {
+    const evaluacion = await EvaluacionMedica.findByPk(req.params.id, {
+      include: [
+        {
+          model: Admision,
+          include: [
+            { model: Paciente },
+            { model: Cama, include: [Sala] }
+          ]
+        }
+      ]
+    });
+    if (!evaluacion) {
+      return res.render("error", { mensaje: "Evaluación médica no encontrada" });
+    }
+    res.render("eva_medicas/detalle", { evaluacion });
+  } catch (error) {
+    console.error(error);
+    res.render("error", { mensaje: "Error al cargar detalle de evaluación médica" });
+  }
+};
+
+// Formulario para editar evaluación médica
+exports.formularioEditarEvaluacion = async (req, res) => {
+  try {
+    const evaluacion = await EvaluacionMedica.findByPk(req.params.id, {
+      include: [
+        {
+          model: Admision,
+          include: [{ model: Paciente }]
+        }
+      ]
+    });
+    if (!evaluacion) {
+      return res.render("error", { mensaje: "Evaluación médica no encontrada" });
+    }
+    res.render("eva_medicas/editar", { evaluacion });
+  } catch (error) {
+    console.error(error);
+    res.render("error", { mensaje: "Error al cargar formulario de edición" });
+  }
+};
+
+// Procesar actualización de evaluación médica (POST)
+exports.editarEvaluacion = async (req, res) => {
+  try {
+    const { diagnostico, tratamiento, seguimiento } = req.body;
+    await EvaluacionMedica.update(
+      { diagnostico, tratamiento, seguimiento },
+      { where: { id: req.params.id } }
+    );
+    res.redirect(`/eva_medicas/${req.params.id}`);
+  } catch (error) {
+    console.error(error);
+    res.render("error", { mensaje: "Error al editar evaluación médica" });
+  }
+};
+
+// Eliminar evaluación
+exports.eliminarEvaluacion = async (req, res) => {
+  try {
+    await EvaluacionMedica.destroy({ where: { id: req.params.id } });
+    res.redirect("/eva_medicas");
+  } catch (error) {
+    res.render("error", { mensaje: "Error al eliminar evaluación" });
+  }
+};

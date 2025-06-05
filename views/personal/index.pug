@@ -30,4 +30,4 @@ block content
                 td
                   a.btn.btn-warning.btn-sm(href=`/personal/editar/${p.id}`) Editar
                   form(action=`/personal/eliminar/${p.id}` method="POST" style="display:inline")
-                    button.btn.btn-danger.btn-sm.ms-2(type="submit") Eliminar
+                    button.btn.btn-danger.btn-sm.ms-2(type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta usuario?')") Eliminar

@@ -26,6 +26,9 @@ block content
         label(for="telefono" class="form-label") Teléfono:
         input(type="text" name="telefono" id="telefono" class="form-control" value=paciente.telefono)
       div.col-md-6
+        label(for="fecha_nac" class="form-label") Fecha de Nacimiento:
+        input(type="date" name="fecha_nac" id="fecha_nac" class="form-control" value=paciente.fecha_nac required)
+      div.col-md-6
         label(for="contacto_emergencia" class="form-label") Contacto de Emergencia:
         input(type="text" name="contacto_emergencia" id="contacto_emergencia" class="form-control" value=paciente.contacto_emergencia)
       div.col-md-12
@@ -34,4 +37,3 @@ block content
       div.col-12
         button(type="submit" class="btn btn-primary") Guardar Cambios
         a.btn.btn-secondary.ms-2(href="/pacientes") Cancelar
-        

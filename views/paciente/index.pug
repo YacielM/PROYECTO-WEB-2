@@ -20,7 +20,7 @@ block content
               th Nombre
               th Apellido
               th Género
-              th Teléfono
+              th Fecha Nacimiento
               th Historial Médico
               th Acciones
           tbody
@@ -31,7 +31,7 @@ block content
                   td= paciente.nombre
                   td= paciente.apellido
                   td= paciente.genero
-                  td= paciente.telefono
+                  td= paciente.fecha_nac
                   td
                     if paciente.historial_medico && paciente.historial_medico !== 'Sin antecedentes médicos relevantes'
                       span.text-dark Con antecedentes médicos relevantes
@@ -39,10 +39,10 @@ block content
                       span.text-dark Sin antecedentes médicos relevantes
                   td
                     a.btn.btn-primary.btn-sm(href=`/pacientes/antecedentes/${paciente.id}`) Ver
-                    a.btn.btn-warning.btn-sm.ms-2(href=`/pacientes/editar/${paciente.id}`) Editar
-                    form(action=`/pacientes/eliminar/${paciente.id}` method="POST" style="display:inline")
-                      button.btn.btn-danger.btn-sm.ms-2(type="submit") Eliminar
+                    if session.rol === 'admin' || session.rol === 'recepcionista'
+                     a.btn.btn-warning.btn-sm.ms-2(href=`/pacientes/editar/${paciente.id}`) Editar
+                     form(action=`/pacientes/eliminar/${paciente.id}` method="POST" style="display:inline")
+                      button.btn.btn-danger.btn-sm.ms-2(type="submit" onclick="return confirm('¿Seguro que deseas eliminar este paciente?')") Eliminar
             else
               tr
                 td.text-center(colspan="9") No hay pacientes registrados
-                

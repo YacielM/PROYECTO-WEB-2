@@ -1,0 +1,40 @@
+extends ../layout.pug
+
+block pageTitle
+  | Detalle de Evaluación Médica
+
+block content
+  .container.mt-4
+    .card.shadow.mb-4
+      .card-header.d-flex.justify-content-between.align-items-center
+        h2.mb-0 Detalle de Evaluación Médica
+      .card-body
+        p
+          b ID:
+          | #{evaluacion.id}
+        p
+          b Fecha de Evaluación:
+          | #{evaluacion.fecha_evaluacion ? evaluacion.fecha_evaluacion.toLocaleDateString('es-AR') : 'Sin fecha'}
+        p
+          b Paciente:
+          | #{evaluacion.Admision && evaluacion.Admision.Paciente ? evaluacion.Admision.Paciente.nombre + " " + evaluacion.Admision.Paciente.apellido : 'Sin paciente'}
+        p
+          b Cama:
+          | #{evaluacion.Admision && evaluacion.Admision.Cama && evaluacion.Admision.Cama.Sala ? `Sala ${evaluacion.Admision.Cama.Sala.numero_sala} - Cama ${evaluacion.Admision.Cama.numero_cama}` : 'Sin cama'}
+        p
+          b Diagnóstico:
+          | #{evaluacion.diagnostico}
+        p
+          b Tratamiento:
+          | #{evaluacion.tratamiento}
+        if evaluacion.seguimiento
+          p
+            b Seguimiento:
+            | #{evaluacion.seguimiento}
+    .d-flex.justify-content-between
+          a.btn.btn-secondary.mt-3(href="/eva_medicas") Volver
+          .d-flex.gap-2
+            a.btn.btn-primary.mt-3(href=`/eva_medicas/editar/${evaluacion.id}`) Editar
+            form(action=`/eva_medicas/eliminar/${evaluacion.id}` method="POST" style="display:inline")
+              button.btn.btn-danger.mt-3(type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta evaluación?')") Eliminar
+

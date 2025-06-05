@@ -14,7 +14,15 @@ block content
             option(value=admision.id)= `Admisión ${admision.id} - ${admision.Paciente.nombre}`
       .mb-3
         label.form-label(for="signos_vitales") Signos Vitales:
-        input.form-control(type="text" name="signos_vitales" required)
+        .row
+          .col
+            input.form-control(type="text" name="ta" placeholder="Tensión Arterial (mmHg)" required)
+          .col
+            input.form-control(type="text" name="fc" placeholder="Frecuencia Cardíaca (lpm)" required)
+          .col
+            input.form-control(type="text" name="temp" placeholder="Temp (°C)" required)
+          .col
+            input.form-control(type="text" name="sato2" placeholder="SatO2 (%)" required)
       .mb-3
         label.form-label(for="sintomas") Síntomas:
         textarea.form-control(name="sintomas" rows="3" required)
@@ -22,4 +30,5 @@ block content
         label.form-label(for="plan_cuidado") Plan de Cuidado:
         textarea.form-control(name="plan_cuidado" rows="3" required)
       button.btn.btn-primary(type="submit") Guardar
+      a.btn.btn-secondary.ms-2(href="/eva_enfermeria") Cancelar
 

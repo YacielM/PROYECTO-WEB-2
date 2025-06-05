@@ -44,162 +44,177 @@ async function seed() {
     await Cama.bulkCreate(camas);
     console.log(' Camas creadas');
 
-    // 3. Crear Pacientes (15 en total)
-    const pacientes = await Paciente.bulkCreate([
-      // Pacientes originales actualizados
-      {
-        dni: '33444555',
-        nombre: 'Carlos',
-        apellido: 'Gómez',
-        genero: 'M',
-        direccion: 'Av. Siempre Viva 742',
-        telefono: '02665551234',
-        contacto_emergencia: '02665551235',
-        historial_medico: 'Hipertensión arterial, alergia a la penicilina, cirugía de apéndice en 2010.'
-      },
-      {
-        dni: '25666777',
-        nombre: 'Ana',
-        apellido: 'López',
-        genero: 'F',
-        direccion: 'Calle Falsa 123',
-        telefono: '02665556789',
-        contacto_emergencia: '02665556780',
-        historial_medico: 'Asma leve, vacunación completa, sin antecedentes quirúrgicos.'
-      },
-      {
-        dni: '37888999',
-        nombre: 'Luisa',
-        apellido: 'Martínez',
-        genero: 'F',
-        direccion: 'Boulevard Central 456',
-        telefono: '02665559012',
-        contacto_emergencia: '02665559013',
-        historial_medico: 'Diabetes tipo 2, tratamiento con metformina, retinopatía diabética en control.'
-      },
-      {
-        dni: '12345678',
-        nombre: 'Pedro',
-        apellido: 'Ramírez',
-        genero: 'M',
-        direccion: 'Calle 9 de Julio 100',
-        telefono: '02665552222',
-        contacto_emergencia: '02665552223',
-        historial_medico: 'Sin antecedentes médicos relevantes'
-      },
-      // Nuevos pacientes (11 adicionales)
-      {
-        dni: '23456789',
-        nombre: 'María',
-        apellido: 'Fernández',
-        genero: 'F',
-        direccion: 'Av. Libertador 1500',
-        telefono: '02664441111',
-        contacto_emergencia: '02664441112',
-        historial_medico: 'Artritis reumatoide, tratamiento con inmunosupresores'
-      },
-      {
-        dni: '34567890',
-        nombre: 'Juan',
-        apellido: 'Pérez',
-        genero: 'M',
-        direccion: 'Calle San Martín 500',
-        telefono: '02663332222',
-        contacto_emergencia: '02663332223',
-        historial_medico: 'Hernia discal L4-L5, en espera de cirugía'
-      },
-      {
-        dni: '45678901',
-        nombre: 'Laura',
-        apellido: 'García',
-        genero: 'F',
-        direccion: 'Bv. España 789',
-        telefono: '02662223344',
-        contacto_emergencia: '02662223345',
-        historial_medico: 'Embarazo de 32 semanas, control prenatal'
-      },
-      {
-        dni: '56789012',
-        nombre: 'Roberto',
-        apellido: 'Sánchez',
-        genero: 'M',
-        direccion: 'Calle Belgrano 321',
-        telefono: '02661112233',
-        contacto_emergencia: '02661112234',
-        historial_medico: 'EPOC, oxigenoterapia domiciliaria'
-      },
-      {
-        dni: '67890123',
-        nombre: 'Sofía',
-        apellido: 'Rodríguez',
-        genero: 'F',
-        direccion: 'Av. Colón 654',
-        telefono: '02669998877',
-        contacto_emergencia: '02669998878',
-        historial_medico: 'Cáncer de mama, en quimioterapia'
-      },
-      {
-        dni: '78901234',
-        nombre: 'Miguel',
-        apellido: 'López',
-        genero: 'M',
-        direccion: 'Calle Sarmiento 987',
-        telefono: '02668887766',
-        contacto_emergencia: '02668887767',
-        historial_medico: 'Insuficiencia cardíaca, marcapasos implantado'
-      },
-      {
-        dni: '89012345',
-        nombre: 'Elena',
-        apellido: 'Martín',
-        genero: 'F',
-        direccion: 'Av. Rivadavia 111',
-        telefono: '02667776655',
-        contacto_emergencia: '02667776656',
-        historial_medico: 'Alzheimer en etapa moderada'
-      },
-      {
-        dni: '90123456',
-        nombre: 'Diego',
-        apellido: 'Gómez',
-        genero: 'M',
-        direccion: 'Calle Mitre 222',
-        telefono: '02666665544',
-        contacto_emergencia: '02666665545',
-        historial_medico: 'Accidente cerebrovascular, en rehabilitación'
-      },
-      {
-        dni: '11223344',
-        nombre: 'Carmen',
-        apellido: 'Díaz',
-        genero: 'F',
-        direccion: 'Bv. San Juan 333',
-        telefono: '02665554433',
-        contacto_emergencia: '02665554434',
-        historial_medico: 'Depresión mayor, tratamiento farmacológico'
-      },
-      {
-        dni: '22334455',
-        nombre: 'Jorge',
-        apellido: 'Ruiz',
-        genero: 'M',
-        direccion: 'Av. Independencia 444',
-        telefono: '02664443322',
-        contacto_emergencia: '02664443323',
-        historial_medico: 'Cirrosis hepática, en lista de trasplante'
-      },
-      {
-        dni: '33445566',
-        nombre: 'Patricia',
-        apellido: 'Hernández',
-        genero: 'F',
-        direccion: 'Calle Urquiza 555',
-        telefono: '02663332211',
-        contacto_emergencia: '02663332212',
-        historial_medico: 'Lupus eritematoso sistémico'
-      }
-    ]);
-    console.log(' Pacientes creados');
+    // 3. Crear Pacientes (15 en total) con fechas de nacimiento
+  const pacientes = await Paciente.bulkCreate([
+    // Pacientes originales actualizados
+    {
+      dni: '33444555',
+      nombre: 'Carlos',
+      apellido: 'Gómez',
+      genero: 'M',
+      fecha_nac: '1975-08-15', // 48 años
+      direccion: 'Av. Siempre Viva 742',
+      telefono: '02665551234',
+      contacto_emergencia: '02665551235',
+      historial_medico: 'Hipertensión arterial, alergia a la penicilina, cirugía de apéndice en 2010.'
+    },
+    {
+      dni: '25666777',
+      nombre: 'Ana',
+      apellido: 'López',
+      genero: 'F',
+      fecha_nac: '1988-03-22', // 35 años
+      direccion: 'Calle Falsa 123',
+      telefono: '02665556789',
+      contacto_emergencia: '02665556780',
+      historial_medico: 'Asma leve, vacunación completa, sin antecedentes quirúrgicos.'
+    },
+    {
+      dni: '37888999',
+      nombre: 'Luisa',
+      apellido: 'Martínez',
+      genero: 'F',
+      fecha_nac: '1965-11-30', // 58 años
+      direccion: 'Boulevard Central 456',
+      telefono: '02665559012',
+      contacto_emergencia: '02665559013',
+      historial_medico: 'Diabetes tipo 2, tratamiento con metformina, retinopatía diabética en control.'
+    },
+    {
+      dni: '12345678',
+      nombre: 'Pedro',
+      apellido: 'Ramírez',
+      genero: 'M',
+      fecha_nac: '1992-07-10', // 31 años
+      direccion: 'Calle 9 de Julio 100',
+      telefono: '02665552222',
+      contacto_emergencia: '02665552223',
+      historial_medico: 'Sin antecedentes médicos relevantes'
+    },
+    // Nuevos pacientes (11 adicionales)
+    {
+      dni: '23456789',
+      nombre: 'María',
+      apellido: 'Fernández',
+      genero: 'F',
+      fecha_nac: '1978-04-05', // 45 años
+      direccion: 'Av. Libertador 1500',
+      telefono: '02664441111',
+      contacto_emergencia: '02664441112',
+      historial_medico: 'Artritis reumatoide, tratamiento con inmunosupresores'
+    },
+    {
+      dni: '34567890',
+      nombre: 'Juan',
+      apellido: 'Pérez',
+      genero: 'M',
+      fecha_nac: '1983-09-18', // 40 años
+      direccion: 'Calle San Martín 500',
+      telefono: '02663332222',
+      contacto_emergencia: '02663332223',
+      historial_medico: 'Hernia discal L4-L5, en espera de cirugía'
+    },
+    {
+      dni: '45678901',
+      nombre: 'Laura',
+      apellido: 'García',
+      genero: 'F',
+      fecha_nac: '1995-12-25', // 28 años
+      direccion: 'Bv. España 789',
+      telefono: '02662223344',
+      contacto_emergencia: '02662223345',
+      historial_medico: 'Embarazo de 32 semanas, control prenatal'
+    },
+    {
+      dni: '56789012',
+      nombre: 'Roberto',
+      apellido: 'Sánchez',
+      genero: 'M',
+      fecha_nac: '1958-02-14', // 65 años
+      direccion: 'Calle Belgrano 321',
+      telefono: '02661112233',
+      contacto_emergencia: '02661112234',
+      historial_medico: 'EPOC, oxigenoterapia domiciliaria'
+    },
+    {
+      dni: '67890123',
+      nombre: 'Sofía',
+      apellido: 'Rodríguez',
+      genero: 'F',
+      fecha_nac: '1972-06-08', // 51 años
+      direccion: 'Av. Colón 654',
+      telefono: '02669998877',
+      contacto_emergencia: '02669998878',
+      historial_medico: 'Cáncer de mama, en quimioterapia'
+    },
+    {
+      dni: '78901234',
+      nombre: 'Miguel',
+      apellido: 'López',
+      genero: 'M',
+      fecha_nac: '1980-10-31', // 43 años
+      direccion: 'Calle Sarmiento 987',
+      telefono: '02668887766',
+      contacto_emergencia: '02668887767',
+      historial_medico: 'Insuficiencia cardíaca, marcapasos implantado'
+    },
+    {
+      dni: '89012345',
+      nombre: 'Elena',
+      apellido: 'Martín',
+      genero: 'F',
+      fecha_nac: '1945-05-20', // 78 años
+      direccion: 'Av. Rivadavia 111',
+      telefono: '02667776655',
+      contacto_emergencia: '02667776656',
+      historial_medico: 'Alzheimer en etapa moderada'
+    },
+    {
+      dni: '90123456',
+      nombre: 'Diego',
+      apellido: 'Gómez',
+      genero: 'M',
+      fecha_nac: '1998-01-15', // 25 años
+      direccion: 'Calle Mitre 222',
+      telefono: '02666665544',
+      contacto_emergencia: '02666665545',
+      historial_medico: 'Accidente cerebrovascular, en rehabilitación'
+    },
+    {
+      dni: '11223344',
+      nombre: 'Carmen',
+      apellido: 'Díaz',
+      genero: 'F',
+      fecha_nac: '1970-07-04', // 53 años
+      direccion: 'Bv. San Juan 333',
+      telefono: '02665554433',
+      contacto_emergencia: '02665554434',
+      historial_medico: 'Depresión mayor, tratamiento farmacológico'
+    },
+    {
+      dni: '22334455',
+      nombre: 'Jorge',
+      apellido: 'Ruiz',
+      genero: 'M',
+      fecha_nac: '1968-12-12', // 55 años
+      direccion: 'Av. Independencia 444',
+      telefono: '02664443322',
+      contacto_emergencia: '02664443323',
+      historial_medico: 'Cirrosis hepática, en lista de trasplante'
+    },
+    {
+      dni: '33445566',
+      nombre: 'Patricia',
+      apellido: 'Hernández',
+      genero: 'F',
+      fecha_nac: '1985-09-28', // 38 años
+      direccion: 'Calle Urquiza 555',
+      telefono: '02663332211',
+      contacto_emergencia: '02663332212',
+      historial_medico: 'Lupus eritematoso sistémico'
+    }
+  ]);
+  console.log(' Pacientes creados con fechas de nacimiento');
 
     // 4. Crear Admisiones (5 en total)
     const admisiones = await Admision.bulkCreate([

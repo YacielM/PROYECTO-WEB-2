@@ -15,6 +15,9 @@ block content
           b Género: 
           | #{paciente.genero}
         p
+          b Fecha de Nacimiento: 
+          | #{paciente.fecha_nac}
+        p
           b Dirección: 
           | #{paciente.direccion}
         p
@@ -30,4 +33,3 @@ block content
         else
           p Sin antecedentes médicos relevantes
     a.btn.btn-secondary.mt-3(href="/pacientes") Volver
-    

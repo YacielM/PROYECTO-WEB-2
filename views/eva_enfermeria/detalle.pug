@@ -1,0 +1,48 @@
+extends ../layout.pug
+
+block content
+  .container.mt-4
+    h2.text-center Detalle de Evaluación de Enfermería
+    .card
+      .card-body
+        p
+          b Fecha de Evaluación: 
+          | #{evaluacion.fecha_evaluacion ? evaluacion.fecha_evaluacion.toLocaleDateString() : 'Sin fecha'}
+        p
+          b Paciente: 
+          | #{evaluacion.Admision && evaluacion.Admision.Paciente ? evaluacion.Admision.Paciente.nombre + ' ' + evaluacion.Admision.Paciente.apellido : 'Sin paciente'}
+
+        // Extraer signos vitales con Regex en el servidor
+        - const regex = /TA: ([^,]+), FC: ([^,]+), Temp: ([^,]+), SatO2: ([^,]+)/
+        - const match = evaluacion.signos_vitales.match(regex)
+
+        p
+          b Tensión Arterial: 
+          | #{match ? match[1] : evaluacion.signos_vitales}
+        p
+          b Frecuencia Cardíaca: 
+          | #{match ? match[2] : ''}
+        p
+          b Temperatura: 
+          | #{match ? match[3] : ''}
+        p
+          b Saturación O2: 
+          | #{match ? match[4] : ''}
+
+        p
+          b Síntomas: 
+          | #{evaluacion.sintomas}
+        p
+          b Plan de Cuidado: 
+          | #{evaluacion.plan_cuidado}
+
+        if evaluacion.seguimiento
+          p
+            b Seguimiento: 
+            | #{evaluacion.seguimiento}
+    .d-flex.justify-content-between
+          a.btn.btn-secondary.mt-3(href="/eva_enfermeria") Volver
+          .d-flex.gap-2
+            a.btn.btn-primary.mt-3(href="/eva_enfermeria/editar/" + evaluacion.id) Editar
+            form(action=`/eva_enfermeria/eliminar/${evaluacion.id}` method="POST" style="display:inline")
+               button.btn.btn-danger.mt-3(type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta evaluación?')") Eliminar 

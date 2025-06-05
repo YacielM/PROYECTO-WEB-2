@@ -1,0 +1,29 @@
+extends ../layout.pug
+
+block pageTitle
+  | Editar Evaluación Médica
+
+block content
+  .container.mt-4
+    .card.shadow.mb-4
+      .card-body
+        h2.text-center.mb-4 Editar Evaluación Médica
+        form(action=`/eva_medicas/editar/${evaluacion.id}` method="POST")
+          .mb-3
+            label.form-label Admisión:
+            input.form-control(
+              type="text" 
+              value=`Admisión ${evaluacion.admision_id} - ${evaluacion.Admision.Paciente.nombre}` 
+              readonly
+            )
+          .mb-3
+            label.form-label Diagnóstico:
+            textarea.form-control(name="diagnostico" rows="3" required)= evaluacion.diagnostico
+          .mb-3
+            label.form-label Tratamiento:
+            textarea.form-control(name="tratamiento" rows="3" required)= evaluacion.tratamiento
+          .mb-3
+            label.form-label Seguimiento:
+            textarea.form-control(name="seguimiento" rows="3")= evaluacion.seguimiento
+          button.btn.btn-primary.mt-3(type="submit") Guardar Cambios
+          a.btn.btn-secondary.mt-3.ms-2(href=`/eva_medicas/${evaluacion.id}`) Cancelar

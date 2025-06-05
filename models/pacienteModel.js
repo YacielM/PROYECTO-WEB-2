@@ -24,6 +24,10 @@ Paciente.init(
       type: DataTypes.ENUM('M', 'F', 'O'),
       allowNull: false
     },
+    fecha_nac: { 
+      type: DataTypes.DATEONLY,
+      allowNull: false
+    },
     direccion: DataTypes.STRING(255),
     telefono: DataTypes.STRING(50),
     contacto_emergencia: DataTypes.STRING(100),
@@ -38,8 +42,8 @@ Paciente.init(
     updatedAt: false,
     validate: {
       camposObligatorios() {
-        if (!this.dni || !this.nombre || !this.apellido || !this.genero) {
-          throw new Error('DNI, nombre, apellido y género son obligatorios');
+        if (!this.dni || !this.nombre || !this.apellido || !this.genero || !this.fecha_nac) {
+          throw new Error('DNI, nombre, fecha de nacimiento, apellido y género son obligatorios');
         }
       }
     }

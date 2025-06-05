@@ -1,7 +1,7 @@
 extends ../layout.pug
 
 block pageTitle
-  | Evaluaciones de Enfermeria
+  | Evaluaciones de Enfermería
 
 block content
   .container
@@ -20,13 +20,20 @@ block content
                 th Signos Vitales
                 th Síntomas
                 th Plan de Cuidado
+                th Acciones
             tbody
               each evaluacion in evaluaciones
                 tr
+                  // Mostramos la fecha en formato local (si existe)
                   td= evaluacion.fecha_evaluacion ? evaluacion.fecha_evaluacion.toLocaleDateString() : ''
+                  // Verificamos que exista la admisión y el paciente asociado
                   td= evaluacion.Admision && evaluacion.Admision.Paciente ? `${evaluacion.Admision.Paciente.nombre} ${evaluacion.Admision.Paciente.apellido}` : 'Sin paciente'
                   td= evaluacion.signos_vitales
                   td= evaluacion.sintomas
-                  td= evaluacion.plan_cuidado
+                  // Si el texto es muy largo, se puede truncar en la tabla
+                  td= evaluacion.plan_cuidado.length > 50 ? evaluacion.plan_cuidado.substring(0, 50) + '...' : evaluacion.plan_cuidado
+                  td
+                    // Botón para ver el detalle completo en el modal
+                    a.btn.btn-info.btn-sm(href=`/eva_enfermeria/detalle/${evaluacion.id}`) Ver                       
         else
           p.text-center No hay evaluaciones registradas.

@@ -26,6 +26,9 @@ block content
         label(for="telefono" class="form-label") Teléfono:
         input(type="text" name="telefono" id="telefono" class="form-control" value=datos && datos.telefono ? datos.telefono : '')
       div.col-md-6
+        label(for="fecha_nac" class="form-label") Fecha de Nacimiento:
+        input(type="date" name="fecha_nac" id="fecha_nac" class="form-control" required value=datos && datos.fecha_nac ? datos.fecha_nac : '')
+      div.col-md-6
         label(for="contacto_emergencia" class="form-label") Contacto de Emergencia:
         input(type="text" name="contacto_emergencia" id="contacto_emergencia" class="form-control" value=datos && datos.contacto_emergencia ? datos.contacto_emergencia : '')
       div.col-md-12
@@ -51,4 +54,3 @@ block content
         document.getElementById('historial_medico').value = '';
       }
     }
-    

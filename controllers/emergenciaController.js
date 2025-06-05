@@ -18,7 +18,8 @@ const paciente = await Paciente.create({
   nombre: req.body.nombre || 'Emergencia',
   apellido: req.body.apellido || 'Sin datos',
   dni: req.body.dni || dniEmergencia,
-  genero: req.body.genero || 'M',
+  genero: req.body.genero || 'O',
+  fecha_nac: req.body.fecha_nac || 1111-11-11,
   telefono: req.body.telefono || null
 });
 

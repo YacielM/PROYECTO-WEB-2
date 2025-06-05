@@ -19,7 +19,7 @@ block content
               .card-header 
                 h5 #{sala.ala} - Sala #{sala.numero_sala} (Capacidad: #{sala.capacidad})
                 form(action=`/habitaciones/eliminar-sala/${sala.id}` method="POST" style="display:inline")
-                  button.btn.btn-danger.btn-sm.ms-2(type="submit") Eliminar Sala
+                  button.btn.btn-danger.btn-sm.ms-2(type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta sala?')") Eliminar Sala
               .card-body
                 .row
                   if sala.Camas && sala.Camas.length > 0
@@ -39,7 +39,7 @@ block content
                             h6.card-title Cama #{cama.numero_cama}
                             p Estado: #{cama.estado}
                             form(action=`/habitaciones/eliminar-cama/${cama.id}` method="POST" style="display:inline")
-                              button.btn.btn-danger.btn-sm(type="submit") Eliminar Cama
+                              button.btn.btn-danger.btn-sm(type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta cama?')") Eliminar Cama
                             if cama.estado === 'En Limpieza'
                               form(action=`/habitaciones/cambiar-estado-cama/${cama.id}` method="POST" style="display:inline")
                                 input(type="hidden" name="estado" value="Disponible")
