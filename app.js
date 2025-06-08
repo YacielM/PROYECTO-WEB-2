@@ -1,7 +1,7 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const db = require('./config/db'); 
-require('dotenv').config();
 require('./models/sync'); 
 const app = express();
 
@@ -65,7 +65,7 @@ app.use((err, req, res, next) => {
     mensaje: 'Error interno del servidor. Contacte al administrador.' 
   });
 });
-
+ 
 // Iniciar el servidor
 if (require.main === module) {
   const PORT = process.env.PORT;
