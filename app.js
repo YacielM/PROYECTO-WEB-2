@@ -66,7 +66,12 @@ app.use((err, req, res, next) => {
 });
 
 // Iniciar el servidor
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  });
+} else {
+  // Exporta la aplicación para que Vercel pueda usarla como función sin servidor
+  module.exports = app;
+}
