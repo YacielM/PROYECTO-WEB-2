@@ -1,16 +1,17 @@
 // db.js
 const { Sequelize } = require('sequelize');
-const mysql2 = require('mysql2'); // Agrega esta línea
+const mysql2 = require('mysql2');
+require('dotenv').config();
 
 const sequelize = new Sequelize(
-  'his_db',   // Nombre de tu BD en MySQL Workbench
-  'root',     // Usuario
-  'admin',    // Contraseña
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
   {
-    host: 'localhost',
+    host: process.env.DB_HOST,
     dialect: 'mysql',
-    dialectModule: mysql2, // Agrega esta opción para forzar el uso de mysql2
-    logging: false // Oculta los logs de SQL en consola
+    dialectModule: mysql2,
+    logging: false,
   }
 );
 

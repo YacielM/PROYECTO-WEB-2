@@ -3,6 +3,7 @@ const path = require('path');
 const db = require('./config/db'); 
 require('./models/sync'); 
 const app = express();
+require('dotenv').config();
 
 // Configurar Pug como motor de plantillas
 app.set('view engine', 'pug');
@@ -67,7 +68,7 @@ app.use((err, req, res, next) => {
 
 // Iniciar el servidor
 if (require.main === module) {
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT;
   db.sync({ alter: true })
   .then(() => {
       console.log("Modelos sincronizados");
