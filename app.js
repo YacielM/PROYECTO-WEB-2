@@ -1,9 +1,9 @@
 const express = require('express');
 const path = require('path');
 const db = require('./config/db'); 
+require('dotenv').config();
 require('./models/sync'); 
 const app = express();
-require('dotenv').config();
 
 // Configurar Pug como motor de plantillas
 app.set('view engine', 'pug');
