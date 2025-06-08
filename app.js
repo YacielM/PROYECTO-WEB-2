@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
-const db = require('./config/db'); // Importa la conexión a la base de datos
-
+const db = require('./config/db'); 
+require('./models/sync'); 
 const app = express();
 
 // Configurar Pug como motor de plantillas
@@ -68,10 +68,16 @@ app.use((err, req, res, next) => {
 // Iniciar el servidor
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
-  });
+  db.sync({ alter: true })
+  .then(() => {
+      console.log("Modelos sincronizados");
+      app.listen(PORT, () => {
+        console.log(`Servidor corriendo en http://localhost:${PORT}`);
+      });
+    })
+    .catch(err => {
+      console.error('Error al sincronizar modelos:', err);
+    });
 } else {
-  // Exporta la aplicación para que Vercel pueda usarla como función sin servidor
   module.exports = app;
 }
