@@ -21,6 +21,10 @@ Admision.init(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    motivo_alta: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     paciente_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

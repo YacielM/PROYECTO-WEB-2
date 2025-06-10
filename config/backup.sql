@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS admisiones (
     tipo_admision ENUM('Programada', 'Emergencia', 'Derivada') NOT NULL,
     estado ENUM('Activo', 'Cancelado', 'Dados de Alta') NOT NULL DEFAULT 'Activo',
     motivo TEXT,
+    motivo_alta TEXT,
     paciente_id INT NOT NULL,
     cama_id INT NOT NULL,
     fecha_admision TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

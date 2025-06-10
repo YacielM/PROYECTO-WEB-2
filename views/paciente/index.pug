@@ -39,10 +39,6 @@ block content
                       span.text-dark Sin antecedentes médicos relevantes
                   td
                     a.btn.btn-primary.btn-sm(href=`/pacientes/antecedentes/${paciente.id}`) Ver
-                    if session.rol === 'admin' || session.rol === 'recepcionista'
-                     a.btn.btn-warning.btn-sm.ms-2(href=`/pacientes/editar/${paciente.id}`) Editar
-                     form(action=`/pacientes/eliminar/${paciente.id}` method="POST" style="display:inline")
-                      button.btn.btn-danger.btn-sm.ms-2(type="submit" onclick="return confirm('¿Seguro que deseas eliminar este paciente?')") Eliminar
             else
               tr
                 td.text-center(colspan="9") No hay pacientes registrados

@@ -261,7 +261,7 @@ exports.darAlta = async (req, res) => {
     if (!admision) throw new Error('Admisión no encontrada');
     await admision.update({
       estado: 'Dados de Alta',
-      motivo: req.body.motivo_alta ? req.body.motivo_alta : admision.motivo
+      motivo_alta: req.body.motivo_alta ? req.body.motivo_alta : admision.motivo_alta
     }, { transaction: t });
     // Cambiar estado de la cama a "En Limpieza"
     await Cama.update(

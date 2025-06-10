@@ -118,7 +118,6 @@ exports.exportarPDF = async (req, res) => {
       return res.status(404).send('Paciente no encontrado');
     }
 
-    // Crear documento PDF con márgenes adecuados y tamaño A4
     const doc = new PDFDocument({ margin: 50, size: 'A4' });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="paciente_${paciente.id}.pdf"`);
@@ -138,23 +137,55 @@ exports.exportarPDF = async (req, res) => {
       .text(`Nombre: ${paciente.nombre} ${paciente.apellido}`)
       .text(`DNI: ${paciente.dni}`)
       .text(`Género: ${paciente.genero}`)
-      .text(`Teléfono: ${paciente.telefono || 'No registrado'}`);
+      .text(`Fecha de nacimiento: ${paciente.fecha_nac}`)
+      .text(`Dirección: ${paciente.direccion || 'No registrada'}`)
+      .text(`Teléfono: ${paciente.telefono || 'No registrado'}`)
+      .text(`Contacto de emergencia: ${paciente.contacto_emergencia || 'No registrado'}`);
+    doc.moveDown();
+
+    // Antecedentes médicos
+    doc
+      .font('Helvetica-Bold')
+      .fontSize(16)
+      .text('Antecedentes médicos:', { underline: true });
+    doc.moveDown(0.5);
+
+    if (paciente.historial_medico && paciente.historial_medico !== 'Sin antecedentes médicos relevantes') {
+      doc
+        .font('Helvetica')
+        .fontSize(12)
+        .text(paciente.historial_medico, { indent: 20 });
+    } else {
+      doc
+        .font('Helvetica')
+        .fontSize(12)
+        .text('Sin antecedentes médicos relevantes', { indent: 20 });
+    }
     doc.moveDown();
 
     // Sección de admisiones (si existen)
-    if (paciente.Admisions && paciente.Admisions.length > 0) {
-      doc
-        .font('Helvetica-Bold')
-        .fontSize(16)
-        .text('Admisiones:', { underline: true });
-      doc.moveDown(0.5);
+    doc
+      .font('Helvetica-Bold')
+      .fontSize(16)
+      .text('Admisiones:', { underline: true });
+    doc.moveDown(0.5);
 
+    if (paciente.Admisions && paciente.Admisions.length > 0) {
       paciente.Admisions.forEach(adm => {
         // Datos de la admisión
         doc
           .font('Helvetica-Bold')
           .fontSize(12)
           .text(`Motivo: ${adm.motivo} | Estado: ${adm.estado}`, { indent: 20 });
+        
+        // Agregar motivo de alta, si corresponde
+        if (adm.estado === 'Dados de Alta' && adm.motivo_alta) {
+          doc.moveDown(0.5);
+          doc
+            .font('Helvetica')
+            .fontSize(12)
+            .text(`Motivo de alta: ${adm.motivo_alta}`, { indent: 30 });
+        }
         doc.moveDown(0.5);
 
         // Evaluación de Enfermería (si existe)
@@ -191,7 +222,13 @@ exports.exportarPDF = async (req, res) => {
 
         doc.moveDown();
       });
+    } else {
+      doc
+        .font('Helvetica')
+        .fontSize(12)
+        .text('Este paciente no ha sido admitido todavía.', { indent: 20 });
     }
+
 
     doc.end();
   } catch (error) {

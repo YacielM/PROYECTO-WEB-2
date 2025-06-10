@@ -38,6 +38,7 @@ El Sistema Hospitalario HIS es una aplicación web diseñada para gestionar de m
 - **cama_id** (FK a Camas)
 - **tipo_admision** (Derivada, Emergencia, Programada)
 - **motivo**
+- **motivo_alta**
 - **estado**
 - **fecha_admision**
 
