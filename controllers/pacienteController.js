@@ -1,4 +1,5 @@
-const Paciente = require('../models/pacienteModel');
+const {Paciente, Admision, EvaluacionEnfermeria, EvaluacionMedica} = require('../models');
+const PDFDocument = require('pdfkit');
 
 // Obtener todos los pacientes o buscar por DNI
 exports.obtenerTodos = async (req, res) => {
@@ -95,3 +96,106 @@ exports.verAntecedentes = async (req, res) => {
   }
 };
 
+
+
+// CONTROLADOR PARA CREAR PDF DEL PACIENTE
+
+exports.exportarPDF = async (req, res) => {
+  try {
+    const paciente = await Paciente.findByPk(req.params.id, {
+      include: [
+        {
+          model: Admision,
+          include: [
+            { model: EvaluacionEnfermeria },
+            { model: EvaluacionMedica }
+          ]
+        }
+      ]
+    });
+
+    if (!paciente) {
+      return res.status(404).send('Paciente no encontrado');
+    }
+
+    // Crear documento PDF con márgenes adecuados y tamaño A4
+    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="paciente_${paciente.id}.pdf"`);
+    doc.pipe(res);
+
+    // Título principal
+    doc
+      .font('Helvetica-Bold')
+      .fontSize(20)
+      .text('Datos del Paciente', { underline: true, align: 'center' });
+    doc.moveDown();
+
+    // Datos básicos del paciente
+    doc
+      .font('Helvetica')
+      .fontSize(12)
+      .text(`Nombre: ${paciente.nombre} ${paciente.apellido}`)
+      .text(`DNI: ${paciente.dni}`)
+      .text(`Género: ${paciente.genero}`)
+      .text(`Teléfono: ${paciente.telefono || 'No registrado'}`);
+    doc.moveDown();
+
+    // Sección de admisiones (si existen)
+    if (paciente.Admisions && paciente.Admisions.length > 0) {
+      doc
+        .font('Helvetica-Bold')
+        .fontSize(16)
+        .text('Admisiones:', { underline: true });
+      doc.moveDown(0.5);
+
+      paciente.Admisions.forEach(adm => {
+        // Datos de la admisión
+        doc
+          .font('Helvetica-Bold')
+          .fontSize(12)
+          .text(`Motivo: ${adm.motivo} | Estado: ${adm.estado}`, { indent: 20 });
+        doc.moveDown(0.5);
+
+        // Evaluación de Enfermería (si existe)
+        if (adm.EvaluacionEnfermeria && adm.EvaluacionEnfermeria.length > 0) {
+          doc
+            .font('Helvetica-Bold')
+            .text('Evaluación Enfermería:', { indent: 40 });
+          adm.EvaluacionEnfermeria.forEach(ev => {
+            doc
+              .font('Helvetica')
+              .text(`- Signos vitales: ${ev.signos_vitales}`, { indent: 60 })
+              .text(`- Síntomas: ${ev.sintomas}`, { indent: 60 })
+              .text(`- Plan de cuidado: ${ev.plan_cuidado}`, { indent: 60 })
+              .text(`- Fecha: ${ev.fecha_evaluacion ? ev.fecha_evaluacion.toLocaleString() : ''}`, { indent: 60 });
+            doc.moveDown(0.5);
+          });
+        }
+
+        // Evaluación Médica (si existe)
+        if (adm.EvaluacionMedicas && adm.EvaluacionMedicas.length > 0) {
+          doc
+            .font('Helvetica-Bold')
+            .text('Evaluación Médica:', { indent: 40 });
+          adm.EvaluacionMedicas.forEach(ev => {
+            doc
+              .font('Helvetica')
+              .text(`- Diagnóstico: ${ev.diagnostico}`, { indent: 60 })
+              .text(`- Tratamiento: ${ev.tratamiento}`, { indent: 60 })
+              .text(`- Seguimiento: ${ev.seguimiento || 'No registrado'}`, { indent: 60 })
+              .text(`- Fecha: ${ev.fecha_evaluacion ? ev.fecha_evaluacion.toLocaleString() : ''}`, { indent: 60 });
+            doc.moveDown(0.5);
+          });
+        }
+
+        doc.moveDown();
+      });
+    }
+
+    doc.end();
+  } catch (error) {
+    console.error('Error al exportar PDF:', error);
+    res.status(500).send('Error generando PDF');
+  }
+};

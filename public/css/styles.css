@@ -18,8 +18,8 @@ body, html {
   color: #0d6efd;
 }
 #sidebar .collapse .nav-link {
-  font-size: 0.98em;
-  padding-left: 2rem;
+  font-size: 1em;
+  
 }
 .border-bottom {
   border-bottom: 1.5px solid #e0e3e7 !important;

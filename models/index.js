@@ -13,6 +13,8 @@ const Turno = require('./turnoModel');
 Admision.belongsTo(Paciente, { foreignKey: "paciente_id" });
 Admision.belongsTo(Cama, { foreignKey: "cama_id" });
 
+//Paciente -> Admisión
+Paciente.hasMany(Admision, { foreignKey: "paciente_id" });
 
 // Admisión -> Evaluaciones
 Admision.hasMany(EvaluacionEnfermeria, { 

@@ -33,3 +33,6 @@ block content
         else
           p Sin antecedentes médicos relevantes
     a.btn.btn-secondary.mt-3(href="/pacientes") Volver
+    a.btn.btn-outline-danger.mt-3.ms-2(href=`/pacientes/${paciente.id}/exportar-pdf`, target="_blank")
+      i.bi.bi-file-earmark-pdf.me-1
+      | Exportar PDF

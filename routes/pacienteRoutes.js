@@ -11,4 +11,6 @@ router.post('/editar/:id',estaAutenticado, tieneRol(['admin', 'medico', 'enferme
 router.post('/eliminar/:id',estaAutenticado, tieneRol(['admin', 'medico', 'enfermero', 'recepcionista']), pacienteController.eliminar);
 router.get('/antecedentes/:id',estaAutenticado, tieneRol(['admin', 'medico', 'enfermero', 'recepcionista']), pacienteController.verAntecedentes);
 
+router.get('/:id/exportar-pdf', pacienteController.exportarPDF);
+
 module.exports = router;

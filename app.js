@@ -34,10 +34,10 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/authRoutes');
 app.use('/', authRoutes);
 
-// Ruta de ejemplo para renderizar el layout o inicio
-app.get('/', (req, res) => {
-  res.render('layout');
-});
+// Ruta de inicio
+const indexRoutes = require('./routes/indexRoutes');
+app.use('/', indexRoutes);
+
 
 // RUTAS principales
 const pacienteRoutes = require('./routes/pacienteRoutes');

@@ -1,13 +1,24 @@
 extends layout.pug
 
 block content
-  h2.mb-4 Bienvenido #{session && session.nombre ? session.nombre : 'al sistema'}
-  if session && session.rol
-    p.text-muted.mb-4
-      | Rol: #{session.rol === 'medico' ? 'Dr.' : ''} #{session.rol}
-  h4 Mensajes
-  //- Aquí puedes iterar sobre mensajes importantes
-  each mensaje in mensajes
-    .card.card-message.p-3
-      h5.mb-1= mensaje.titulo
-      p.mb-0= mensaje.texto
+  .container.mt-5
+    .row.justify-content-center
+      .col-md-8
+        .card.shadow-lg
+          .row.g-0
+            .col-md-5.d-flex.align-items-center.justify-content-center.bg-light
+              img.img-fluid.rounded-start(src="/images/PortadaHospital.png" alt="Portada HIS" style="max-height:320px;")
+            .col-md-7
+              .card-body
+                if !session || !session.usuarioId
+                
+                  h2.mb-3.text-primary Bienvenido al Sistema HIS
+                  p
+                    | El Hospital HIS es un sistema integral para la gestión de pacientes, personal y recursos hospitalarios. 
+                    | Accede a tus funciones administrativas, médicas y de enfermería de manera segura y eficiente.
+                  p.mt-3
+                    | Por favor, inicia sesión para acceder a las funcionalidades del sistema.
+                else
+                  h2.mb-3.text-success Bienvenido, #{session.nombre} #{session.apellido}!
+                  p
+                    | Nos alegra verte nuevamente en el sistema HIS. Desde aquí puedes gestionar pacientes, admisiones, turnos y mucho más según tu rol.

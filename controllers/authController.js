@@ -13,6 +13,8 @@ exports.login = async (req, res) => {
   }
   req.session.usuarioId = user.id;
   req.session.rol = user.rol;
+  req.session.nombre = user.nombre;
+  req.session.apellido = user.apellido;
   res.redirect('/');
 };
 
