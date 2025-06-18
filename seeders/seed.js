@@ -1,6 +1,6 @@
 const sequelize = require('../config/db');
 const { EvaluacionEnfermeria, EvaluacionMedica, Admision,
-   Paciente, Cama, Sala, Usuario } = require('../models');
+   Paciente, Cama, Sala, Usuario, Turno } = require('../models');
 const bcrypt = require('bcrypt');
 
 async function seed() {
@@ -24,25 +24,35 @@ async function seed() {
     ]);
     console.log(' Salas creadas');
 
-    // 2. Crear Camas (ampliadas)
-    const camas = [];
-    const estados = ['Disponible', 'Ocupada', 'En Limpieza'];
-    
-    // Crear 4 camas por sala
-    for (const sala of salas) {
-      for (let i = 1; i <= 2; i++) {
-        const estado = estados[Math.floor(Math.random() * estados.length)];
-        camas.push({
-          sala_id: sala.id,
-          numero_cama: i,
-          estado: estado,
-          restriccion_genero: 'Ninguno'
-        });
-      }
-    }
-    
-    await Cama.bulkCreate(camas);
-    console.log(' Camas creadas');
+    // 2. Crear Camas (todas disponibles, solo 2 en limpieza, y luego las de admisión en ocupada)
+const camas = [];
+const totalCamas = salas.length * 2; 
+let camasEnLimpieza = [];
+
+// Crear todas las camas como disponibles
+for (const sala of salas) {
+  for (let i = 1; i <= 2; i++) {
+    camas.push({
+      sala_id: sala.id,
+      numero_cama: i,
+      estado: 'Disponible',
+      restriccion_genero: 'Ninguno'
+    });
+  }
+}
+
+// Elegir 2 camas aleatorias para poner en limpieza
+while (camasEnLimpieza.length < 2) {
+  const idx = Math.floor(Math.random() * camas.length);
+  if (!camasEnLimpieza.includes(idx)) {
+    camasEnLimpieza.push(idx);
+    camas[idx].estado = 'En Limpieza';
+  }
+}
+
+await Cama.bulkCreate(camas);
+console.log(' Camas creadas');
+
 
     // 3. Crear Pacientes (15 en total) con fechas de nacimiento
   const pacientes = await Paciente.bulkCreate([
@@ -261,6 +271,14 @@ async function seed() {
     fecha_admision: new Date('2024-05-05')
   }
 ]);
+for (const adm of admisiones) {
+  const cama = await Cama.findByPk(adm.cama_id);
+  if (cama) {
+    cama.estado = 'Ocupada';
+    await cama.save();
+  }
+}
+console.log(' Camas ocupadas actualizadas según admisiones');
 console.log(' Admisiones creadas');
 
     // 5. Evaluaciones de Enfermería (5 en total)
@@ -384,6 +402,32 @@ await Usuario.create({
   email: 'gordonfreeman@gmail.com',
   telefono: '02664666332'
 });
+// 8. Crear algunos turnos de ejemplo (asignando un médico existente)
+    const medico = await Usuario.findOne({ where: { rol: 'medico' } });
+    await Turno.bulkCreate([
+      {
+        paciente_id: pacientes[0].id,
+        medico_id: medico.id,
+        fecha: new Date('2024-06-20T09:00:00'),
+        estado: 'pendiente',
+        motivo: 'Control post alta'
+      },
+      {
+        paciente_id: pacientes[1].id,
+        medico_id: medico.id,
+        fecha: new Date('2024-06-21T10:30:00'),
+        estado: 'pendiente',
+        motivo: 'Consulta prequirúrgica'
+      },
+      {
+        paciente_id: pacientes[2].id,
+        medico_id: medico.id,
+        fecha: new Date('2024-06-22T11:00:00'),
+        estado: 'pendiente',
+        motivo: 'Chequeo general'
+      }
+    ]);
+    console.log('Turnos de ejemplo creados');
 console.log('Usuarios de prueba creados');
 
     console.log('¡Datos de prueba insertados exitosamente!');
