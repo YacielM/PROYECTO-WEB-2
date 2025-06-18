@@ -86,14 +86,16 @@ exports.crearAdmision = async (req, res) => {
 
     // 2. Si la sala tiene capacidad 2, buscar la otra cama ocupada
     if (sala.capacidad === 2) {
-      // Buscar otra cama ocupada en la misma sala
-      const otraCamaOcupada = await Cama.findOne({
+      // Traer todas las camas ocupadas de la sala
+      const camasOcupadas = await Cama.findAll({
         where: {
           sala_id: sala.id,
-          id: { [Op.ne]: cama.id }, // que no sea la misma cama
           estado: 'Ocupada'
         }
       });
+
+      // Buscar la otra cama ocupada (que no sea la seleccionada)
+      const otraCamaOcupada = camasOcupadas.find(c => c.id != cama.id);
 
       if (otraCamaOcupada) {
         // Buscar el género del paciente que ocupa la otra cama
