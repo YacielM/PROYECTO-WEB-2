@@ -1,3 +1,4 @@
+//- views/eva_enfermeria/editar.pug
 extends ../layout.pug
 
 block pageTitle
@@ -8,11 +9,16 @@ block content
     .card.shadow.mb-4
       .card-body
         h2.text-center.mb-4 Editar Evaluación de Enfermería
+
+        //- Formulario para editar evaluación existente
         form(action=`/eva_enfermeria/editar/${evaluacion.id}` method="POST")
           .mb-3
+            //- Admisión vinculada (solo lectura)
             label.form-label Admisión:
             input.form-control(type="text" value=`Admisión ${evaluacion.admision_id} - ${evaluacion.Admision.Paciente.nombre}` readonly)
+
           .mb-3
+            //- Signos vitales editables
             label.form-label Signos Vitales:
             .row
               .col
@@ -23,11 +29,17 @@ block content
                 input.form-control(type="text" name="temp" placeholder="Temp (°C)" required value=temp)
               .col
                 input.form-control(type="text" name="sato2" placeholder="SatO2 (%)" required value=sato2)
+
           .mb-3
+            //- Síntomas editables
             label.form-label(for="sintomas") Síntomas:
             textarea.form-control(name="sintomas" rows="3" required)= evaluacion.sintomas
+
           .mb-3
+            //- Plan de cuidado editable
             label.form-label(for="plan_cuidado") Plan de Cuidado:
             textarea.form-control(name="plan_cuidado" rows="3" required)= evaluacion.plan_cuidado
+
+          //- Botones de acción
           button.btn.btn-primary.mt-3(type="submit") Guardar Cambios
           a.btn.btn-secondary.mt-3.ms-2(href="/eva_enfermeria") Cancelar

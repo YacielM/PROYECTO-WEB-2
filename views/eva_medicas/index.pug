@@ -1,3 +1,4 @@
+//- views/eva_medicas/index.pug
 extends ../layout.pug
 
 block pageTitle
@@ -8,14 +9,54 @@ block content
     .card.shadow.mb-4
       .card-body
         h1.text-center Evaluaciones Médicas
-        a.btn.btn-success.mb-3(href="/eva_medicas/nuevo") Nueva Evaluación
+
+        //- Buscador por paciente y fecha, y orden
+        form(action="/eva_medicas" method="get" class="mb-3 d-flex align-items-center gap-2")
+          input.form-control.me-2(type="text" name="paciente" placeholder="Buscar por paciente..." value=pacienteFiltro)
+          input.form-control.me-2(type="date" name="fecha" value=fechaFiltro)
+          input(type="hidden" name="orden" value=orden)
+          input(type="hidden" name="direccion" value=direccion)
+          button.btn.btn-secondary(type="submit") Buscar
+          a.btn.btn-success.ms-auto(href="/eva_medicas/nuevo") Nueva Evaluación
+
+        //- Estilos mínimos para encabezados ordenables
+        style.
+          .sort-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            color: #000;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            font-family: inherit;
+          }
+          .sort-btn:focus { outline: none; box-shadow: none; transform: none; }
+          .sort-btn::-moz-focus-inner { border: 0; }
+
         if evaluaciones && evaluaciones.length > 0
           table.table.table-striped
             thead
               tr
                 th ID
-                th Fecha
-                th Paciente
+                th
+                  form(action="/eva_medicas" method="get")
+                    input(type="hidden" name="paciente" value=pacienteFiltro)
+                    input(type="hidden" name="fecha" value=fechaFiltro)
+                    input(type="hidden" name="pagina" value="1")
+                    input(type="hidden" name="orden" value="fecha_evaluacion")
+                    input(type="hidden" name="direccion" value=(orden === 'fecha_evaluacion' && direccion === 'ASC' ? 'DESC' : 'ASC'))
+                    button.sort-btn(type="submit") Fecha
+                th
+                  form(action="/eva_medicas" method="get")
+                    input(type="hidden" name="paciente" value=pacienteFiltro)
+                    input(type="hidden" name="fecha" value=fechaFiltro)
+                    input(type="hidden" name="pagina" value="1")
+                    input(type="hidden" name="orden" value="paciente")
+                    input(type="hidden" name="direccion" value=(orden === 'paciente' && direccion === 'ASC' ? 'DESC' : 'ASC'))
+                    button.sort-btn(type="submit") Paciente
                 th Cama
                 th Diagnóstico
                 th Tratamiento
@@ -24,12 +65,33 @@ block content
               each evaluacion in evaluaciones
                 tr
                   td= evaluacion.id
-                  td= evaluacion.fecha_evaluacion && evaluacion.fecha_evaluacion.toLocaleDateString ? evaluacion.fecha_evaluacion.toLocaleDateString('es-AR') : 'Sin fecha'
-                  td= evaluacion.Admision && evaluacion.Admision.Paciente ? `${evaluacion.Admision.Paciente.nombre} ${evaluacion.Admision.Paciente.apellido}` : 'Sin paciente'
-                  td= evaluacion.Admision && evaluacion.Admision.Cama && evaluacion.Admision.Cama.Sala ? `Sala ${evaluacion.Admision.Cama.Sala.numero_sala} - Cama ${evaluacion.Admision.Cama.numero_cama}` : 'Sin cama'
-                  td= evaluacion.diagnostico ? evaluacion.diagnostico.substring(0, 30) + '...' : evaluacion.diagnostico
-                  td= evaluacion.tratamiento ? evaluacion.tratamiento.substring(0, 30) + '...' : ''
+                  td= evaluacion.fecha_evaluacion ? evaluacion.fecha_evaluacion.toLocaleDateString('es-AR') : 'Sin fecha'
                   td
-                    a.btn.btn-info.btn-sm(href=`/eva_medicas/${evaluacion.id}`) Ver
+                    if evaluacion.paciente_id
+                      a(href=`/pacientes/antecedentes/${evaluacion.paciente_id}`)= evaluacion.pacienteNombre
+                    else
+                      = evaluacion.pacienteNombre
+                  td= evaluacion.cama
+                  td= evaluacion.diagnostico.length > 30 ? evaluacion.diagnostico.substring(0,30) + '...' : evaluacion.diagnostico
+                  td= evaluacion.tratamiento.length > 30 ? evaluacion.tratamiento.substring(0,30) + '...' : evaluacion.tratamiento
+                  td
+                    a.btn.btn-info.btn-sm(href=`/eva_medicas/detalle/${evaluacion.id}`) Ver
         else
           p.text-center No hay evaluaciones registradas.
+
+        //- Paginación
+        if totalPaginas && totalPaginas > 1
+          nav.mt-3(aria-label="Paginación de evaluaciones")
+            ul.pagination
+              li.page-item(class=(pagina <= 1 ? 'disabled' : ''))
+                a.page-link(href=`/eva_medicas?pagina=${pagina-1 <= 1 ? 1 : pagina-1}&orden=${orden}&direccion=${direccion}&paciente=${pacienteFiltro || ''}&fecha=${fechaFiltro || ''}`) Anterior
+              - const start = Math.max(1, pagina - 2);
+              - const end = Math.min(totalPaginas, pagina + 2);
+              each p in Array(end - start + 1).fill().map((_, i) => start + i)
+                li.page-item(class=(p === pagina ? 'active' : ''))
+                  a.page-link(href=`/eva_medicas?pagina=${p}&orden=${orden}&direccion=${direccion}&paciente=${pacienteFiltro || ''}&fecha=${fechaFiltro || ''}`)= p
+              li.page-item(class=(pagina >= totalPaginas ? 'disabled' : ''))
+                a.page-link(href=`/eva_medicas?pagina=${pagina+1 >= totalPaginas ? totalPaginas : pagina+1}&orden=${orden}&direccion=${direccion}&paciente=${pacienteFiltro || ''}&fecha=${fechaFiltro || ''}`) Siguiente
+
+        if typeof count !== 'undefined'
+          p.text-muted.mt-2 Mostrando página #{pagina} de #{totalPaginas} — Total de evaluaciones: #{count}

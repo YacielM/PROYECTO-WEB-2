@@ -6,8 +6,10 @@ block content
     h1.text-center Dar de Alta al Paciente
     .card.shadow
       .card-body
+        //- Formulario para dar de alta a un paciente
         form(action=`/admisiones/alta/${admision.id}` method="POST")
           .mb-3
+            //- Selección del tipo de alta
             label.form-label(for="tipo_alta") Tipo de Alta:
             select.form-select(name="tipo_alta" required)
               option(value="") Seleccione el tipo de alta...
@@ -15,8 +17,13 @@ block content
               option(value="Traslado") Traslado a otro hospital
               option(value="Voluntaria") Alta voluntaria del paciente
               option(value="Fallecido") Fallecimiento
+            small.text-muted Seleccione el motivo por el cual se da el alta.
+
           .mb-3
+            //- Motivo opcional del alta
             label.form-label(for="motivo_alta") Motivo (opcional):
             textarea.form-control(name="motivo_alta" rows="3")
+
+          //- Botones de acción
           button.btn.btn-success(type="submit") Confirmar Alta
           a.btn.btn-secondary.ms-2(href="/admisiones") Cancelar

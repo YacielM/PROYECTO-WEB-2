@@ -1,3 +1,4 @@
+//- views/paciente/antecedentes.pug
 extends ../layout.pug
 
 block content
@@ -5,34 +6,61 @@ block content
     h2.text-center Detalle del Paciente
     .card
       .card-body
+        //- Datos básicos del paciente
         p
-          b Nombre: 
+          b Nombre:
           | #{paciente.nombre} #{paciente.apellido}
         p
-          b DNI: 
+          b DNI:
           | #{paciente.dni}
         p
-          b Género: 
+          b Género:
           | #{paciente.genero}
         p
-          b Fecha de Nacimiento: 
+          b Fecha de Nacimiento:
           | #{paciente.fecha_nac}
         p
-          b Dirección: 
+          b Dirección:
           | #{paciente.direccion}
         p
-          b Teléfono: 
+          b Teléfono:
           | #{paciente.telefono}
         p
-          b Contacto de Emergencia: 
+          b Contacto de Emergencia:
           | #{paciente.contacto_emergencia}
+
         hr
+        //- Antecedentes médicos
         h5 Antecedentes médicos:
         if paciente.historial_medico && paciente.historial_medico !== 'Sin antecedentes médicos relevantes'
           p= paciente.historial_medico
         else
           p Sin antecedentes médicos relevantes
-    .d-flex.justify-content-between.align-items-center
+
+        hr
+        //- Resumen de evaluaciones y botones directos al detalle más reciente
+        .row.mb-3
+          .col-md-6
+            h6 Evaluaciones de Enfermería
+            if tieneEvaEnfermeria
+              p.text-success Hay evaluaciones de enfermería registradas.
+              //- Ir al detalle de la evaluación más reciente
+              a.btn.btn-outline-primary(href=`/eva_enfermeria/detalle/${ultimoEnfId}`) Ver última evaluación de Enfermería
+            else
+              p.text-muted No hay evaluaciones de enfermería registradas.
+              a.btn.btn-outline-secondary.disabled(href="#") Ver última evaluación de Enfermería
+          .col-md-6
+            h6 Evaluaciones Médicas
+            if tieneEvaMedica
+              p.text-success Hay evaluaciones médicas registradas.
+              //- Ir al detalle de la evaluación médica más reciente
+              a.btn.btn-outline-primary(href=`/eva_medicas/detalle/${ultimoMedId}`) Ver última evaluación Médica
+            else
+              p.text-muted No hay evaluaciones médicas registradas.
+              a.btn.btn-outline-secondary.disabled(href="#") Ver última evaluación Médica
+
+    //- Botones de acción y exportación
+    .d-flex.justify-content-between.align-items-center.mt-3
       .d-flex.gap-2
         a.btn.btn-secondary.mt-3(href="/pacientes") Volver
         a.btn.btn-outline-danger.mt-3.ms-2(href=`/pacientes/${paciente.id}/exportar-pdf`, target="_blank")
@@ -42,4 +70,4 @@ block content
         if session.rol === 'admin' || session.rol === 'recepcionista'
           a.btn.btn-primary.mt-3(href="/pacientes/editar/" + paciente.id) Editar
           form(action=`/pacientes/eliminar/${paciente.id}` method="POST" style="display:inline")
-            button.btn.btn-danger.mt-3(type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta evaluación?')") Eliminar 
+            button.btn.btn-danger.mt-3(type="submit" onclick="return confirm('¿Seguro que deseas eliminar este paciente?')") Eliminar

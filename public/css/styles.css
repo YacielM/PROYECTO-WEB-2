@@ -31,6 +31,9 @@ body, html {
   background: #fff;
   border: 1px solid #e0e3e7;
 }
+
+
+
 @media (max-width: 767px) {
   #sidebar {
     display: none !important;

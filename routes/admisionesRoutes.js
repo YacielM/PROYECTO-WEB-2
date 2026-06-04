@@ -5,7 +5,7 @@ const admisionController = require('../controllers/admisionController');
 const { estaAutenticado, tieneRol } = require('../middlewares/auth');
 
 // Listar admisiones
-router.get('/', estaAutenticado, tieneRol(['admin', 'recepcionista']), admisionController.listarAdmisiones);
+router.get('/', estaAutenticado, tieneRol(['admin', 'recepcionista','medico']), admisionController.listarAdmisiones);
 
 // Formulario y creación
 router.get('/nuevo',estaAutenticado, tieneRol(['admin', 'recepcionista']), admisionController.formularioNuevaAdmision);

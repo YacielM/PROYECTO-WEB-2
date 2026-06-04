@@ -1,48 +1,72 @@
+//- views/pacientes/nuevo.pug
 extends ../layout.pug
 
 block content
   h1.text-center.mt-4 Agregar Nuevo Paciente
   div.container.mt-4
+    //- Formulario para crear nuevo paciente
     form(action="/pacientes/nuevo" method="POST" class="row g-3")
+      //- DNI
       div.col-md-6
         label(for="dni" class="form-label") DNI:
         input(type="text" name="dni" id="dni" class="form-control" required value=datos && datos.dni ? datos.dni : '')
+
+      //- Nombre
       div.col-md-6
         label(for="nombre" class="form-label") Nombre:
         input(type="text" name="nombre" id="nombre" class="form-control" required value=datos && datos.nombre ? datos.nombre : '')
+
+      //- Apellido
       div.col-md-6
         label(for="apellido" class="form-label") Apellido:
         input(type="text" name="apellido" id="apellido" class="form-control" required value=datos && datos.apellido ? datos.apellido : '')
+
+      //- Género
       div.col-md-6
         label(for="genero" class="form-label") Género:
         select(name="genero" id="genero" class="form-select" required)
           option(value="M" selected=datos && datos.genero === 'M') Masculino
           option(value="F" selected=datos && datos.genero === 'F') Femenino
           option(value="O" selected=datos && datos.genero === 'O') Otro
+
+      //- Dirección
       div.col-md-12
         label(for="direccion" class="form-label") Dirección:
         input(type="text" name="direccion" id="direccion" class="form-control" value=datos && datos.direccion ? datos.direccion : '')
+
+      //- Teléfono
       div.col-md-6
         label(for="telefono" class="form-label") Teléfono:
         input(type="text" name="telefono" id="telefono" class="form-control" value=datos && datos.telefono ? datos.telefono : '')
+
+      //- Fecha de nacimiento
       div.col-md-6
         label(for="fecha_nac" class="form-label") Fecha de Nacimiento:
         input(type="date" name="fecha_nac" id="fecha_nac" class="form-control" required value=datos && datos.fecha_nac ? datos.fecha_nac : '')
+
+      //- Contacto de emergencia
       div.col-md-6
         label(for="contacto_emergencia" class="form-label") Contacto de Emergencia:
         input(type="text" name="contacto_emergencia" id="contacto_emergencia" class="form-control" value=datos && datos.contacto_emergencia ? datos.contacto_emergencia : '')
+
+      //- Antecedentes médicos (toggle dinámico con JS)
       div.col-md-12
         label.form-label ¿Antecedentes médicos relevantes?
         select.form-select(name="tiene_antecedentes" id="tiene_antecedentes" required onchange="toggleAntecedentes()")
           option(value="no" selected=(!datos || !datos.historial_medico || datos.historial_medico === 'Sin antecedentes médicos relevantes')) No
           option(value="si" selected=(datos && datos.historial_medico && datos.historial_medico !== 'Sin antecedentes médicos relevantes')) Sí
+
+      //- Caja de antecedentes (se muestra solo si elige "Sí")
       div.col-md-12#antecedentesBox(style={display: (!datos || !datos.historial_medico || datos.historial_medico === 'Sin antecedentes médicos relevantes') ? 'none' : 'block'})
         label(for="historial_medico" class="form-label") Detalle de antecedentes:
         textarea(name="historial_medico" id="historial_medico" class="form-control")= datos && datos.historial_medico && datos.historial_medico !== 'Sin antecedentes médicos relevantes' ? datos.historial_medico : ''
+
+      //- Botones de acción
       div.col-12
         button(type="submit" class="btn btn-success") Guardar
         a.btn.btn-secondary.ms-2(href="/pacientes") Cancelar
 
+  //- Script para mostrar/ocultar antecedentes
   script.
     function toggleAntecedentes() {
       var select = document.getElementById('tiene_antecedentes');

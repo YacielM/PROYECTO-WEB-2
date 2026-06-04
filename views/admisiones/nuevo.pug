@@ -6,12 +6,14 @@ block content
     h1.text-center Nueva Admisión
     .card.shadow
       .card-body
+        //- Mensaje de error si algo falla en el controlador
         if error
           .alert.alert-danger= error
 
+        //- Formulario principal para crear nueva admisión
         form(action="/admisiones/nuevo" method="POST")
           .row.g-3
-            //- Selección de Paciente
+            //- Selección de Paciente (dropdown con todos los pacientes)
             .col-md-6
               label.form-label(for="paciente_id") Paciente:
               select.form-select(name="paciente_id" required)
@@ -19,7 +21,7 @@ block content
                 each paciente in pacientes
                   option(value=paciente.id)= `${paciente.nombre} ${paciente.apellido} (DNI: ${paciente.dni})`
 
-            //- Selección de Cama Disponible
+            //- Selección de Cama Disponible (dropdown con camas y sala)
             .col-md-6
               label.form-label(for="cama_id") Cama:
               select.form-select(name="cama_id" required)
@@ -27,7 +29,7 @@ block content
                 each cama in camas
                   option(value=cama.id)= `Cama ${cama.numero_cama} - Sala ${cama.Sala.numero_sala} (${cama.Sala.ala})`
 
-            //- Tipo de Admisión
+            //- Tipo de Admisión (Programada, Emergencia, Derivada)
             .col-md-6
               label.form-label(for="tipo_admision") Tipo de Admisión:
               select.form-select(name="tipo_admision" required)
@@ -35,11 +37,12 @@ block content
                 option(value="Emergencia") Emergencia
                 option(value="Derivada") Derivada
 
-            //- Motivo
+            //- Motivo de la admisión (textarea obligatorio)
             .col-md-12
               label.form-label(for="motivo") Motivo:
               textarea.form-control(name="motivo" rows="3" required)
 
+          //- Botones de acción
           .mt-4
             button.btn.btn-success(type="submit") Guardar
             a.btn.btn-secondary.ms-2(href="/admisiones") Cancelar

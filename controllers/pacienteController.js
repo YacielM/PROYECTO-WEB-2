@@ -1,25 +1,121 @@
-const {Paciente, Admision, EvaluacionEnfermeria, EvaluacionMedica} = require('../models');
+// controllers/pacientesController.js
+
+const { Paciente, Admision, EvaluacionEnfermeria, EvaluacionMedica } = require('../models');
 const PDFDocument = require('pdfkit');
 
-// Obtener todos los pacientes o buscar por DNI
+const DEFAULT_LIMIT = 10;
+
+// Listar pacientes: filtros, orden, paginación y flag de admisión activa
+// Listar pacientes: filtros, orden, paginación y flag de admisión activa
+// Listar pacientes: filtros, orden, paginación y flag de admisión activa
 exports.obtenerTodos = async (req, res) => {
   try {
-    let pacientes;
-    let busqueda = req.query.dni || '';
-    if (busqueda) {
-      pacientes = await Paciente.findAll({ where: { dni: busqueda } });
-    } else {
-      pacientes = await Paciente.findAll();
-    }
+    const busquedaDni = (req.query.dni || '').trim();
+    const busquedaNombre = (req.query.nombre || '').trim().toLowerCase();
+    const ordenQuery = req.query.orden || 'apellido';
+    const direccion = (req.query.direccion || 'ASC').toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+    const pagina = Math.max(1, parseInt(req.query.pagina, 10) || 1);
+    const limite = parseInt(req.query.limite, 10) || DEFAULT_LIMIT;
+
+    // Traer todos con inclusión de admisiones activas (required: false)
+    const pacientesRaw = await Paciente.findAll({
+      include: [
+        {
+          model: Admision,
+          where: { estado: 'Activo' },
+          required: false,
+          attributes: ['id']
+        }
+      ]
+    });
+
+    const lista = Array.isArray(pacientesRaw) ? pacientesRaw : [];
+
+    // Filtrado en memoria
+    let pacientesFiltrados = lista.filter(p => {
+      if (busquedaDni && !(p.dni || '').toString().includes(busquedaDni)) return false;
+      if (busquedaNombre) {
+        const nombreCompleto = `${p.nombre || ''} ${p.apellido || ''}`.toLowerCase();
+        if (!nombreCompleto.includes(busquedaNombre)) return false;
+      }
+      return true;
+    });
+
+    // Ordenamiento en memoria: ahora admite 'admisiones' además de campos normales
+    const camposPermitidos = ['nombre', 'apellido', 'dni', 'fecha_nac', 'admisiones'];
+    const campoOrden = camposPermitidos.includes(ordenQuery) ? ordenQuery : 'apellido';
+
+    pacientesFiltrados.sort((a, b) => {
+      // Orden por admisiones activas: primero los que tienen admisión (ASC = con admisión primero)
+      if (campoOrden === 'admisiones') {
+        const aHas = (Array.isArray(a.Admisions) ? a.Admisions.length : (a.Admisions ? 1 : 0)) > 0;
+        const bHas = (Array.isArray(b.Admisions) ? b.Admisions.length : (b.Admisions ? 1 : 0)) > 0;
+        if (aHas === bHas) return 0;
+        return direccion === 'ASC' ? (aHas ? -1 : 1) : (aHas ? 1 : -1);
+      }
+
+      // Orden por fecha
+      if (campoOrden === 'fecha_nac') {
+        const va = a.fecha_nac ? new Date(a.fecha_nac) : new Date(0);
+        const vb = b.fecha_nac ? new Date(b.fecha_nac) : new Date(0);
+        const diff = va - vb;
+        return direccion === 'ASC' ? diff : -diff;
+      }
+
+      // Orden por string
+      const va = (a[campoOrden] || '').toString().toLowerCase();
+      const vb = (b[campoOrden] || '').toString().toLowerCase();
+      if (va < vb) return direccion === 'ASC' ? -1 : 1;
+      if (va > vb) return direccion === 'ASC' ? 1 : -1;
+      return 0;
+    });
+
+    // Paginación
+    const count = pacientesFiltrados.length;
+    const totalPaginas = Math.max(1, Math.ceil(count / limite));
+    const offset = (pagina - 1) * limite;
+    const pacientesPage = pacientesFiltrados.slice(offset, offset + limite);
+
+    // Formateo seguro
+    const pacientes = pacientesPage.map(p => {
+      let fechaFormateada = '';
+      if (p.fecha_nac) {
+        const d = new Date(p.fecha_nac);
+        if (!isNaN(d)) fechaFormateada = d.toLocaleDateString('es-AR');
+      }
+      const admisionesArr = Array.isArray(p.Admisions) ? p.Admisions : (p.Admisions ? [p.Admisions] : []);
+      return {
+        id: p.id,
+        dni: p.dni || '',
+        nombre: p.nombre || '',
+        apellido: p.apellido || '',
+        genero: p.genero || '',
+        fecha_nac: fechaFormateada,
+        historial_medico: p.historial_medico || 'Sin antecedentes médicos relevantes',
+        tieneAdmisionActiva: admisionesArr.length > 0
+      };
+    });
+
     res.render('paciente/index', {
-    pacientes,
-    busqueda: req.query.dni || '',
-    activePage: 'pacientes-gestion'
-  });
+      pacientes,
+      busqueda: busquedaDni,
+      busquedaDni,
+      busquedaNombre,
+      pagina,
+      totalPaginas,
+      limite,
+      orden: ordenQuery,
+      direccion,
+      count,
+      activePage: 'pacientes-gestion'
+    });
   } catch (error) {
+    console.error('Error obtenerTodos pacientes:', error);
     res.status(500).render('error', { mensaje: 'Error al cargar pacientes' });
   }
 };
+
+
 
 // Mostrar formulario de nuevo paciente (vista)
 exports.mostrarFormularioNuevo = (req, res) => {
@@ -85,17 +181,57 @@ exports.eliminar = async (req, res) => {
   }
 };
 
-// Ver antecedentes médicos (GET)
+// controllers/pacientesController.js
+
+// Ver antecedentes médicos (GET) - trae la última evaluación médica y de enfermería de forma robusta
 exports.verAntecedentes = async (req, res) => {
   try {
-    const paciente = await Paciente.findByPk(req.params.id);
+    const pacienteId = req.params.id;
+    const paciente = await Paciente.findByPk(pacienteId);
     if (!paciente) throw new Error('Paciente no encontrado');
-    res.render('paciente/antecedentes', { paciente });
+
+    // Última evaluación médica del paciente (todas las admisiones)
+    const ultimaMedica = await EvaluacionMedica.findOne({
+      include: [{
+        model: Admision,
+        where: { paciente_id: pacienteId },
+        attributes: ['id', 'paciente_id']
+      }],
+      order: [['fecha_evaluacion', 'DESC']],
+      limit: 1
+    });
+
+    // Última evaluación de enfermería del paciente (todas las admisiones)
+    const ultimaEnfermeria = await EvaluacionEnfermeria.findOne({
+      include: [{
+        model: Admision,
+        where: { paciente_id: pacienteId },
+        attributes: ['id', 'paciente_id']
+      }],
+      order: [['fecha_evaluacion', 'DESC']],
+      limit: 1
+    });
+
+    // Flags y datos para la vista
+    const tieneEvaMedica = !!ultimaMedica;
+    const tieneEvaEnfermeria = !!ultimaEnfermeria;
+    const ultimoMedId = ultimaMedica ? ultimaMedica.id : null;
+    const ultimoEnfId = ultimaEnfermeria ? ultimaEnfermeria.id : null;
+
+    res.render('paciente/antecedentes', {
+      paciente,
+      tieneEvaMedica,
+      tieneEvaEnfermeria,
+      ultimoMedId,
+      ultimoEnfId,
+      ultimaMedica,
+      ultimaEnfermeria
+    });
   } catch (error) {
+    console.error('Error verAntecedentes:', error);
     res.redirect('/pacientes');
   }
 };
-
 
 
 // CONTROLADOR PARA CREAR PDF DEL PACIENTE

@@ -1,3 +1,4 @@
+//- views/eva_enfermeria/detalle.pug
 extends ../layout.pug
 
 block content
@@ -6,43 +7,54 @@ block content
     .card
       .card-body
         p
-          b Fecha de Evaluación: 
-          | #{evaluacion.fecha_evaluacion ? evaluacion.fecha_evaluacion.toLocaleDateString() : 'Sin fecha'}
+          b Fecha de Evaluación:
+          | #{evaluacion.fecha_evaluacion ? new Date(evaluacion.fecha_evaluacion).toLocaleDateString('es-AR') : 'Sin fecha'}
         p
-          b Paciente: 
+          b Paciente:
           | #{evaluacion.Admision && evaluacion.Admision.Paciente ? evaluacion.Admision.Paciente.nombre + ' ' + evaluacion.Admision.Paciente.apellido : 'Sin paciente'}
 
-        // Extraer signos vitales con Regex en el servidor
-        - const regex = /TA: ([^,]+), FC: ([^,]+), Temp: ([^,]+), SatO2: ([^,]+)/
-        - const match = evaluacion.signos_vitales.match(regex)
+        //- Extraer signos vitales de forma tolerante a distintos formatos
+        - const signosRaw = (evaluacion.signos_vitales || '').toString();
+        - const extract = (label) => {
+        -   const re = new RegExp(label + '\\s*:\\s*([\\s\\S]*?)(?=(?:TA:|FC:|Temp(?:eratura)?:|SatO2:|$))', 'i');
+        -   const m = signosRaw.match(re);
+        -   return m ? m[1].trim().replace(/^[,;:\\s]+|[,;:\\s]+$/g, '') : '';
+        - };
+        - const taVal = extract('TA');
+        - const fcVal = extract('FC');
+        - const tempVal = extract('Temp') || extract('Temperatura');
+        - const sato2Val = extract('SatO2');
 
         p
-          b Tensión Arterial: 
-          | #{match ? match[1] : evaluacion.signos_vitales}
+          b Tensión Arterial:
+          | #{taVal || (signosRaw ? signosRaw : 'No registrado')}
         p
-          b Frecuencia Cardíaca: 
-          | #{match ? match[2] : ''}
+          b Frecuencia Cardíaca:
+          | #{fcVal || 'No registrada'}
         p
-          b Temperatura: 
-          | #{match ? match[3] : ''}
+          b Temperatura:
+          | #{tempVal || 'No registrada'}
         p
-          b Saturación O2: 
-          | #{match ? match[4] : ''}
+          b Saturación O2:
+          | #{sato2Val || 'No registrada'}
+
+        hr
 
         p
-          b Síntomas: 
-          | #{evaluacion.sintomas}
+          b Síntomas:
+          | #{evaluacion.sintomas || 'No registrado'}
         p
-          b Plan de Cuidado: 
-          | #{evaluacion.plan_cuidado}
+          b Plan de Cuidado:
+          | #{evaluacion.plan_cuidado || 'No registrado'}
 
         if evaluacion.seguimiento
           p
-            b Seguimiento: 
+            b Seguimiento:
             | #{evaluacion.seguimiento}
-    .d-flex.justify-content-between
-          a.btn.btn-secondary.mt-3(href="/eva_enfermeria") Volver
-          .d-flex.gap-2
-            a.btn.btn-primary.mt-3(href="/eva_enfermeria/editar/" + evaluacion.id) Editar
-            form(action=`/eva_enfermeria/eliminar/${evaluacion.id}` method="POST" style="display:inline")
-               button.btn.btn-danger.mt-3(type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta evaluación?')") Eliminar 
+
+    .d-flex.justify-content-between.mt-3
+      a.btn.btn-secondary(href="/eva_enfermeria") Volver
+      .d-flex.gap-2
+        a.btn.btn-primary(href=`/eva_enfermeria/editar/${evaluacion.id}`) Editar
+        form(action=`/eva_enfermeria/eliminar/${evaluacion.id}` method="POST" style="display:inline")
+          button.btn.btn-danger(type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta evaluación?')") Eliminar

@@ -3,42 +3,133 @@
 const sequelize = require('../config/db');
 const { Admision, Paciente, Cama, Sala, Turno } = require('../models');
 
+const DEFAULT_LIMIT = 10;
 
-// Listar todas las admisiones con datos relacionados
+// Listar admisiones con filtros, orden y paginación
 exports.listarAdmisiones = async (req, res) => {
   try {
-    const admisiones = await Admision.findAll({
+    const qPaciente = (req.query.paciente || '').trim().toLowerCase();
+    const qFecha = req.query.fecha || ''; // yyyy-mm-dd desde input date
+    const ordenQuery = req.query.orden || 'fecha_admision';
+    const direccion = (req.query.direccion || 'DESC').toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    const pagina = Math.max(1, parseInt(req.query.pagina, 10) || 1);
+    const limite = parseInt(req.query.limite, 10) || DEFAULT_LIMIT;
+    const offset = (pagina - 1) * limite;
+
+    // Traer admisiones con relaciones
+    const admisionesRaw = await Admision.findAll({
       include: [
-        { 
-          model: Paciente,
-          attributes: ['nombre', 'apellido', 'dni']
-        },
-        { 
-          model: Cama,
-          include: [Sala],
-          attributes: ['numero_cama']
-        }
-      ],
-      order: [['fecha_admision', 'DESC']]
+        { model: Paciente, attributes: ['id', 'nombre', 'apellido', 'dni'] },
+        { model: Cama, include: [Sala], attributes: ['numero_cama'] }
+      ]
     });
+
+    const lista = Array.isArray(admisionesRaw) ? admisionesRaw : [];
+
+    // Helper: compara fecha local (YYYY-MM-DD) o usa rango local (inicio/fin del día)
+    const fechaEsIgualLocal = (fechaObj, qFechaStr) => {
+      if (!fechaObj || !qFechaStr) return false;
+      // Construir start/end del día en zona local a partir de qFechaStr
+      const parts = qFechaStr.split('-').map(Number);
+      if (parts.length !== 3) return false;
+      const [qy, qm, qd] = parts;
+      const start = new Date(qy, qm - 1, qd, 0, 0, 0, 0); // inicio del día local
+      const end = new Date(qy, qm - 1, qd, 23, 59, 59, 999); // fin del día local
+
+      // Normalizar fechaObj a Date
+      let fa;
+      if (typeof fechaObj === 'string') {
+        // Si viene como 'YYYY-MM-DD' o 'YYYY-MM-DDTHH:MM:SS', intentar parseo local
+        const m = fechaObj.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) {
+          fa = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+          // Si la string incluye hora, fallback a Date(string)
+          if (fechaObj.length > 10) fa = new Date(fechaObj);
+        } else {
+          fa = new Date(fechaObj);
+        }
+      } else {
+        fa = new Date(fechaObj);
+      }
+      if (isNaN(fa)) return false;
+      return fa >= start && fa <= end;
+    };
+
+    // Filtrado por paciente y por fecha (comparando localmente)
+    let filtradas = lista.filter(a => {
+      if (qPaciente) {
+        const nombreCompleto = `${(a.Paciente && a.Paciente.nombre) || ''} ${(a.Paciente && a.Paciente.apellido) || ''}`.toLowerCase();
+        if (!nombreCompleto.includes(qPaciente)) return false;
+      }
+      if (qFecha) {
+        if (!a.fecha_admision) return false;
+        if (!fechaEsIgualLocal(a.fecha_admision, qFecha)) return false;
+      }
+      return true;
+    });
+
+    // Ordenamiento seguro: permitimos campos concretos (incluye tipo_admision)
+    const camposPermitidos = ['fecha_admision', 'tipo_admision', 'estado', 'paciente'];
+    const campoOrden = camposPermitidos.includes(ordenQuery) ? ordenQuery : 'fecha_admision';
+
+    filtradas.sort((x, y) => {
+      if (campoOrden === 'paciente') {
+        const ax = `${(x.Paciente && x.Paciente.nombre) || ''} ${(x.Paciente && x.Paciente.apellido) || ''}`.toLowerCase();
+        const ay = `${(y.Paciente && y.Paciente.nombre) || ''} ${(y.Paciente && y.Paciente.apellido) || ''}`.toLowerCase();
+        if (ax < ay) return direccion === 'ASC' ? -1 : 1;
+        if (ax > ay) return direccion === 'ASC' ? 1 : -1;
+        return 0;
+      }
+
+      if (campoOrden === 'fecha_admision') {
+        const da = x.fecha_admision ? new Date(x.fecha_admision) : new Date(0);
+        const db = y.fecha_admision ? new Date(y.fecha_admision) : new Date(0);
+        return direccion === 'ASC' ? da - db : db - da;
+      }
+
+      // tipo_admision o estado (strings)
+      const va = ((x[campoOrden] || '')).toString().toLowerCase();
+      const vb = ((y[campoOrden] || '')).toString().toLowerCase();
+      if (va < vb) return direccion === 'ASC' ? -1 : 1;
+      if (va > vb) return direccion === 'ASC' ? 1 : -1;
+      return 0;
+    });
+
+    // Paginación
+    const count = filtradas.length;
+    const totalPaginas = Math.max(1, Math.ceil(count / limite));
+    const pageItems = filtradas.slice(offset, offset + limite);
+
+    // Formateo para la vista
+    const admisiones = pageItems.map(adm => ({
+      id: adm.id,
+      paciente: adm.Paciente ? `${adm.Paciente.nombre} ${adm.Paciente.apellido}` : 'Sin paciente',
+      paciente_id: adm.Paciente ? adm.Paciente.id : null,
+      dni: adm.Paciente ? adm.Paciente.dni : '',
+      fecha_admision: adm.fecha_admision ? new Date(adm.fecha_admision).toLocaleDateString('es-AR') : '',
+      tipo_admision: adm.tipo_admision || '',
+      estado: adm.estado || '',
+      cama: adm.Cama && adm.Cama.Sala ? `Cama ${adm.Cama.numero_cama} - Sala ${adm.Cama.Sala.numero_sala}` : (adm.Cama ? `Cama ${adm.Cama.numero_cama}` : '')
+    }));
 
     res.render('admisiones/index', {
-      admisiones: admisiones.map(admision => ({
-        id: admision.id,
-        paciente: `${admision.Paciente.nombre} ${admision.Paciente.apellido}`,
-        dni: admision.Paciente.dni,
-        fecha_admision: admision.fecha_admision.toLocaleDateString('es-AR'),
-        tipo_admision: admision.tipo_admision,
-        estado: admision.estado,
-        cama: `Cama ${admision.Cama.numero_cama} - Sala ${admision.Cama.Sala.numero_sala}`
-      }))
+      admisiones,
+      pagina,
+      totalPaginas,
+      limite,
+      orden: ordenQuery,
+      direccion,
+      pacienteFiltro: req.query.paciente || '',
+      fechaFiltro: req.query.fecha || '',
+      count
     });
-
   } catch (error) {
     console.error('Error listarAdmisiones:', error);
     res.status(500).render('error', { mensaje: 'Error al cargar el listado' });
   }
 };
+
+
 
 // Formulario para nueva admisión
 exports.formularioNuevaAdmision = async (req, res) => {

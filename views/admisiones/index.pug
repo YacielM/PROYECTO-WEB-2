@@ -1,3 +1,4 @@
+//- views/admisiones/index.pug
 extends ../layout.pug
 
 block pageTitle
@@ -8,25 +9,83 @@ block content
     .card.shadow.mb-4
       .card-body
         h1.text-center.mt-4 Lista de Admisiones
+
+        //- Buscador por paciente y fecha
+        form(action="/admisiones" method="get" class="mb-3 d-flex")
+          input.form-control.me-2(type="text" name="paciente" placeholder="Buscar por paciente..." value=pacienteFiltro)
+          input.form-control.me-2(type="date" name="fecha" value=fechaFiltro)
+          input(type="hidden" name="orden" value=orden)
+          input(type="hidden" name="direccion" value=direccion)
+          button.btn.btn-secondary(type="submit") Buscar
+
+        //- Estilos mínimos: encabezados en negro, negrita y subrayados; evitar zoom/focus
+        style.
+          .sort-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            color: #000;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            font-family: inherit;
+          }
+          .sort-btn:focus { outline: none; box-shadow: none; transform: none; }
+          .sort-btn::-moz-focus-inner { border: 0; }
+
         div.container.mt-4
+          //- Botón para crear nueva admisión
           div.d-flex.justify-content-end.mb-3
             a.btn.btn-success(href="/admisiones/nuevo") Nueva Admisión
+
+          //- Tabla principal de admisiones
           table.table.table-striped.table-hover
             thead
               tr
                 th ID
-                th Paciente
-                th Fecha Admisión
+                //- Orden por paciente
+                th
+                  form(action="/admisiones" method="get")
+                    input(type="hidden" name="paciente" value=pacienteFiltro)
+                    input(type="hidden" name="fecha" value=fechaFiltro)
+                    input(type="hidden" name="pagina" value="1")
+                    input(type="hidden" name="orden" value="paciente")
+                    input(type="hidden" name="direccion" value=(orden === 'paciente' && direccion === 'ASC' ? 'DESC' : 'ASC'))
+                    button.sort-btn(type="submit") Paciente
+                //- Orden por fecha
+                th
+                  form(action="/admisiones" method="get")
+                    input(type="hidden" name="paciente" value=pacienteFiltro)
+                    input(type="hidden" name="fecha" value=fechaFiltro)
+                    input(type="hidden" name="pagina" value="1")
+                    input(type="hidden" name="orden" value="fecha_admision")
+                    input(type="hidden" name="direccion" value=(orden === 'fecha_admision' && direccion === 'ASC' ? 'DESC' : 'ASC'))
+                    button.sort-btn(type="submit") Fecha Admisión
                 th Tipo
-                th Estado
+                //- Orden por estado
+                th
+                  form(action="/admisiones" method="get")
+                    input(type="hidden" name="paciente" value=pacienteFiltro)
+                    input(type="hidden" name="fecha" value=fechaFiltro)
+                    input(type="hidden" name="pagina" value="1")
+                    input(type="hidden" name="orden" value="estado")
+                    input(type="hidden" name="direccion" value=(orden === 'estado' && direccion === 'ASC' ? 'DESC' : 'ASC'))
+                    button.sort-btn(type="submit") Estado
                 th Cama
                 th Acciones
             tbody
-              if admisiones.length > 0
+              if admisiones && admisiones.length > 0
                 each admision in admisiones
                   tr
                     td= admision.id
-                    td= admision.paciente
+                    //- Vinculación: link al paciente desde la admisión (ruta existente)
+                    td
+                      if admision.paciente_id
+                        a(href=`/pacientes/antecedentes/${admision.paciente_id}`)= admision.paciente
+                      else
+                        span.text-muted= admision.paciente
                     td= admision.fecha_admision
                     td= admision.tipo_admision
                     td= admision.estado
@@ -36,10 +95,27 @@ block content
                         form(action=`/admisiones/reactivar/${admision.id}` method="POST" style="display:inline")
                           button.btn.btn-success.btn-sm(type="submit") Reactivar
                       else
-                        a.btn.btn-primary.btn-sm(href=`/admisiones/alta/${admision.id}`) Dada de alta
+                        a.btn.btn-primary.btn-sm(href=`/admisiones/alta/${admision.id}`) Dar de alta
                       a.btn.btn-warning.btn-sm.ms-2(href=`/admisiones/editar/${admision.id}`) Editar
                       form(action=`/admisiones/eliminar/${admision.id}` method="POST" style="display:inline")
                         button.btn.btn-danger.btn-sm.ms-2(type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta admisión?')") Eliminar
               else
                 tr
                   td.text-center(colspan="7") No hay admisiones registradas.
+
+        //- Paginación simple (si hay varias páginas)
+        if totalPaginas && totalPaginas > 1
+          nav.mt-3(aria-label="Paginación de admisiones")
+            ul.pagination
+              li.page-item(class=(pagina <= 1 ? 'disabled' : ''))
+                a.page-link(href=`/admisiones?pagina=${pagina-1 <= 1 ? 1 : pagina-1}&orden=${orden}&direccion=${direccion}&paciente=${pacienteFiltro || ''}&fecha=${fechaFiltro || ''}`) Anterior
+              - const start = Math.max(1, pagina - 2);
+              - const end = Math.min(totalPaginas, pagina + 2);
+              each p in Array(end - start + 1).fill().map((_, i) => start + i)
+                li.page-item(class=(p === pagina ? 'active' : ''))
+                  a.page-link(href=`/admisiones?pagina=${p}&orden=${orden}&direccion=${direccion}&paciente=${pacienteFiltro || ''}&fecha=${fechaFiltro || ''}`)= p
+              li.page-item(class=(pagina >= totalPaginas ? 'disabled' : ''))
+                a.page-link(href=`/admisiones?pagina=${pagina+1 >= totalPaginas ? totalPaginas : pagina+1}&orden=${orden}&direccion=${direccion}&paciente=${pacienteFiltro || ''}&fecha=${fechaFiltro || ''}`) Siguiente
+
+        if typeof count !== 'undefined'
+          p.text-muted.mt-2 Mostrando página #{pagina} de #{totalPaginas} — Total de admisiones: #{count}

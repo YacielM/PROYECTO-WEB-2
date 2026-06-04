@@ -1,3 +1,4 @@
+//- views/paciente/index.pug
 extends ../layout.pug
 
 block pageTitle
@@ -8,26 +9,82 @@ block content
     .card.shadow.mb-4
       .card-body
         h2.mb-3 Lista de Pacientes
-        div.d-flex.justify-content-between.mb-3
-          form.d-flex(action="/pacientes" method="GET")
-            input.form-control.me-2(type="text" name="dni" placeholder="Buscar por DNI" value=busqueda)
-            button.btn.btn-primary(type="submit") Buscar
+
+        //- Estilos mínimos para evitar zoom/focus y dejar encabezados en negro subrayado
+        style.
+          /* encabezados ordenables: apariencia de texto negro subrayado, sin color azul */
+          .sort-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            color: #000;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 700; /* <-- negrita */
+          }
+          /* quitar efecto táctil/focus que puede "zoom" en algunos navegadores */
+          .sort-btn:focus { outline: none; box-shadow: none; transform: none; }
+          .sort-btn::-moz-focus-inner { border: 0; }
+
+        //- Buscador: DNI y Nombre (preserva orden y dirección)
+        form.d-flex(action="/pacientes" method="GET")
+          input.form-control.me-2(type="text" name="dni" placeholder="Buscar por DNI" value=busquedaDni)
+          input.form-control.me-2(type="text" name="nombre" placeholder="Buscar por Nombre" value=busquedaNombre)
+          input(type="hidden" name="orden" value=orden)
+          input(type="hidden" name="direccion" value=direccion)
+          button.btn.btn-primary(type="submit") Buscar
           a.btn.btn-success.ms-2(href="/pacientes/nuevo") Nuevo Paciente
-        table.table.table-striped.table-hover
+
+        //- Tabla con encabezados ordenables (botones)
+        table.table.table-striped.table-hover.mt-3
           thead
             tr
               th DNI
-              th Nombre
-              th Apellido
+              th
+                form(action="/pacientes" method="GET")
+                  //- mantener filtros actuales al cambiar orden
+                  input(type="hidden" name="dni" value=busquedaDni)
+                  input(type="hidden" name="nombre" value=busquedaNombre)
+                  input(type="hidden" name="pagina" value="1")
+                  input(type="hidden" name="orden" value="nombre")
+                  input(type="hidden" name="direccion" value=(orden === 'nombre' && direccion === 'ASC' ? 'DESC' : 'ASC'))
+                  button.sort-btn(type="submit") Nombre
+              th
+                form(action="/pacientes" method="GET")
+                  input(type="hidden" name="dni" value=busquedaDni)
+                  input(type="hidden" name="nombre" value=busquedaNombre)
+                  input(type="hidden" name="pagina" value="1")
+                  input(type="hidden" name="orden" value="apellido")
+                  input(type="hidden" name="direccion" value=(orden === 'apellido' && direccion === 'ASC' ? 'DESC' : 'ASC'))
+                  button.sort-btn(type="submit") Apellido
               th Género
-              th Fecha Nacimiento
+              th
+                form(action="/pacientes" method="GET")
+                  input(type="hidden" name="dni" value=busquedaDni)
+                  input(type="hidden" name="nombre" value=busquedaNombre)
+                  input(type="hidden" name="pagina" value="1")
+                  input(type="hidden" name="orden" value="fecha_nac")
+                  input(type="hidden" name="direccion" value=(orden === 'fecha_nac' && direccion === 'ASC' ? 'DESC' : 'ASC'))
+                  button.sort-btn(type="submit") Fecha Nacimiento
               th Historial Médico
+              th
+                form(action="/pacientes" method="GET")
+                  input(type="hidden" name="dni" value=busquedaDni)
+                  input(type="hidden" name="nombre" value=busquedaNombre)
+                  input(type="hidden" name="pagina" value="1")
+                  input(type="hidden" name="orden" value="admisiones")
+                  input(type="hidden" name="direccion" value=(orden === 'admisiones' && direccion === 'ASC' ? 'DESC' : 'ASC'))
+                  button.sort-btn(type="submit") Admisión Activa
               th Acciones
           tbody
-            if pacientes.length > 0
+            if pacientes && pacientes.length > 0
               each paciente in pacientes
                 tr
                   td= paciente.dni
+                  //- nombre ya NO es link; el botón "Ver" es el que abre detalles
                   td= paciente.nombre
                   td= paciente.apellido
                   td= paciente.genero
@@ -38,7 +95,31 @@ block content
                     else
                       span.text-dark Sin antecedentes médicos relevantes
                   td
+                    if paciente.tieneAdmisionActiva
+                      span.badge.bg-success Admisión activa
+                    else
+                      span.badge.bg-secondary Sin admisión activa
+                  td
                     a.btn.btn-primary.btn-sm(href=`/pacientes/antecedentes/${paciente.id}`) Ver
             else
               tr
-                td.text-center(colspan="9") No hay pacientes registrados
+                td.text-center(colspan="8") No hay pacientes registrados
+
+        //- Paginación (preserva filtros y orden)
+        if totalPaginas && totalPaginas > 1
+          nav.mt-3(aria-label="Paginación de pacientes")
+            ul.pagination
+              li.page-item(class=(pagina <= 1 ? 'disabled' : ''))
+                a.page-link(href=`/pacientes?pagina=${pagina-1 <= 1 ? 1 : pagina-1}&orden=${orden}&direccion=${direccion}&dni=${busquedaDni || ''}&nombre=${busquedaNombre || ''}`) Anterior
+
+              - const start = Math.max(1, pagina - 2);
+              - const end = Math.min(totalPaginas, pagina + 2);
+              each p in Array(end - start + 1).fill().map((_, i) => start + i)
+                li.page-item(class=(p === pagina ? 'active' : ''))
+                  a.page-link(href=`/pacientes?pagina=${p}&orden=${orden}&direccion=${direccion}&dni=${busquedaDni || ''}&nombre=${busquedaNombre || ''}`)= p
+
+              li.page-item(class=(pagina >= totalPaginas ? 'disabled' : ''))
+                a.page-link(href=`/pacientes?pagina=${pagina+1 >= totalPaginas ? totalPaginas : pagina+1}&orden=${orden}&direccion=${direccion}&dni=${busquedaDni || ''}&nombre=${busquedaNombre || ''}`) Siguiente
+
+        if typeof count !== 'undefined'
+          p.text-muted.mt-2 Mostrando página #{pagina} de #{totalPaginas} — Total de pacientes: #{count}

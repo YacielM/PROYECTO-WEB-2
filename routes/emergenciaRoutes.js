@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const emergenciaController = require('../controllers/emergenciaController');
+const { estaAutenticado, tieneRol } = require('../middlewares/auth');
 
 // Mostrar formulario
-router.get('/', emergenciaController.formularioEmergencia);
+router.get('/',estaAutenticado, tieneRol(['admin','medico', 'enfermero','recepcionista']), emergenciaController.formularioEmergencia);
 
 // Procesar formulario
-router.post('/', emergenciaController.registrarEmergencia);
+router.post('/',estaAutenticado, tieneRol(['admin','medico', 'enfermero','recepcionista']), emergenciaController.registrarEmergencia);
 
 module.exports = router;
