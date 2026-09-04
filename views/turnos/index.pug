@@ -1,3 +1,4 @@
+//- views/turnos/index.pug
 extends ../layout.pug
 
 block pageTitle
@@ -7,40 +8,144 @@ block content
   .container
     .card.shadow.mb-4
       .card-body
-        h2 Turnos
-        if session.rol === 'admin' || session.rol === 'recepcionista'
-          a.btn.btn-success(href="/turnos/nuevo") Nuevo Turno
-        table.table.table-striped.mt-3
-          thead
-            tr
-              th Fecha
-              th Paciente
-              th Médico
-              th Motivo
-              th Estado
-              th Acciones
-          tbody
-            each t in turnos
+        h2.mb-3 Turnos
+
+        style.
+          .sort-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            color: #000;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 700;
+          }
+          .sort-btn:focus { outline: none; box-shadow: none; transform: none; }
+          .sort-btn::-moz-focus-inner { border: 0; }
+
+        //- Buscador y filtros
+        form.row.g-2.mb-3(action="/turnos" method="GET")
+          .col-md-3
+            input.form-control(type="text" name="paciente" placeholder="Buscar por Paciente o DNI" value=busquedaPaciente)
+          if session.rol !== 'medico'
+            .col-md-3
+              input.form-control(type="text" name="medico" placeholder="Buscar por Médico" value=busquedaMedico)
+          .col-md-3
+            select.form-select(name="estado")
+              option(value="") -- Todos los estados --
+              option(value="pendiente" selected=busquedaEstado==='pendiente') Pendiente
+              option(value="atendido" selected=busquedaEstado==='atendido') Atendido
+              option(value="cancelado" selected=busquedaEstado==='cancelado') Cancelado
+              option(value="internacion_pendiente" selected=busquedaEstado==='internacion_pendiente') Internación Pendiente
+          input(type="hidden" name="orden" value=orden)
+          input(type="hidden" name="direccion" value=direccion)
+          .col-md-3.d-flex
+            button.btn.btn-primary.w-100(type="submit") Buscar
+            if session.rol === 'admin' || session.rol === 'recepcionista'
+              a.btn.btn-success.ms-2.w-100(href="/turnos/nuevo") Nuevo Turno
+
+        //- Tabla de turnos con ordenamiento por columnas
+        .table-responsive
+          table.table.table-striped.table-hover.mt-3
+            thead
               tr
-                td= t.fecha.toLocaleString()
-                td= t.Paciente ? t.Paciente.nombre + ' ' + t.Paciente.apellido : ''
-                td= t.medico ? t.medico.nombre + ' ' + t.medico.apellido : ''
-                td= t.motivo
-                td= t.estado
-                td
-                  if session.rol === 'admin' || session.rol === 'recepcionista'
-                    a.btn.btn-warning.btn-sm(href=`/turnos/editar/${t.id}`) Editar
-                    form(action=`/turnos/eliminar/${t.id}` method="POST" style="display:inline")
-                      button.btn.btn-danger.btn-sm.ms-2(type="submit" onclick="return confirm('¿Seguro que deseas eliminar este turno?')") Eliminar
-                  if t.estado === 'pendiente' && (session.rol === 'admin' || session.rol === 'recepcionista' || session.rol === 'medico')
-                    form(action=`/turnos/estado/${t.id}` method="POST" style="display:inline")
-                      input(type="hidden" name="estado" value="atendido")
-                      button.btn.btn-success.btn-sm.ms-2(type="submit") Atender
-                    form(action=`/turnos/estado/${t.id}` method="POST" style="display:inline")
-                      input(type="hidden" name="estado" value="cancelado")
-                      button.btn.btn-secondary.btn-sm.ms-2(type="submit") Cancelar
-                  // Mostrar botón Internar si el turno está atendido y el paciente no tiene admisión activa
-                  if t.estado === 'atendido' && !t.Paciente.tieneAdmisionActiva && t.estado !== 'internacion_pendiente'
-                    a.btn.btn-primary.btn-sm.ms-2(href=`/admisiones/nuevo_desde_turno/${t.id}`) Internar
-                  else if t.estado === 'internacion_pendiente'
-                      span.badge.bg-info.ms-2 Se mandó a internar
+                th
+                  form(action="/turnos" method="GET")
+                    input(type="hidden" name="paciente" value=busquedaPaciente)
+                    input(type="hidden" name="medico" value=busquedaMedico)
+                    input(type="hidden" name="estado" value=busquedaEstado)
+                    input(type="hidden" name="pagina" value="1")
+                    input(type="hidden" name="orden" value="fecha")
+                    input(type="hidden" name="direccion" value=(orden === 'fecha' && direccion === 'ASC' ? 'DESC' : 'ASC'))
+                    button.sort-btn(type="submit") Fecha y Hora
+                th
+                  form(action="/turnos" method="GET")
+                    input(type="hidden" name="paciente" value=busquedaPaciente)
+                    input(type="hidden" name="medico" value=busquedaMedico)
+                    input(type="hidden" name="estado" value=busquedaEstado)
+                    input(type="hidden" name="pagina" value="1")
+                    input(type="hidden" name="orden" value="paciente")
+                    input(type="hidden" name="direccion" value=(orden === 'paciente' && direccion === 'ASC' ? 'DESC' : 'ASC'))
+                    button.sort-btn(type="submit") Paciente
+                th
+                  form(action="/turnos" method="GET")
+                    input(type="hidden" name="paciente" value=busquedaPaciente)
+                    input(type="hidden" name="medico" value=busquedaMedico)
+                    input(type="hidden" name="estado" value=busquedaEstado)
+                    input(type="hidden" name="pagina" value="1")
+                    input(type="hidden" name="orden" value="medico")
+                    input(type="hidden" name="direccion" value=(orden === 'medico' && direccion === 'ASC' ? 'DESC' : 'ASC'))
+                    button.sort-btn(type="submit") Médico
+                th Motivo
+                th
+                  form(action="/turnos" method="GET")
+                    input(type="hidden" name="paciente" value=busquedaPaciente)
+                    input(type="hidden" name="medico" value=busquedaMedico)
+                    input(type="hidden" name="estado" value=busquedaEstado)
+                    input(type="hidden" name="pagina" value="1")
+                    input(type="hidden" name="orden" value="estado")
+                    input(type="hidden" name="direccion" value=(orden === 'estado' && direccion === 'ASC' ? 'DESC' : 'ASC'))
+                    button.sort-btn(type="submit") Estado
+                th Acciones
+            tbody
+              if turnos && turnos.length > 0
+                each t in turnos
+                  tr
+                    td= t.fecha
+                    td= t.pacienteNombre
+                    td= t.medicoNombre
+                    td= t.motivo
+                    td
+                      if t.estado === 'pendiente'
+                        span.badge.bg-warning.text-dark Pendiente
+                      else if t.estado === 'atendido'
+                        span.badge.bg-success Atendido
+                      else if t.estado === 'cancelado'
+                        span.badge.bg-secondary Cancelado
+                      else if t.estado === 'internacion_pendiente'
+                        span.badge.bg-info.text-dark Internación Pendiente
+                      else
+                        span.badge.bg-light.text-dark= t.estado
+                    td
+                      if session.rol === 'admin' || session.rol === 'recepcionista'
+                        a.btn.btn-warning.btn-sm(href=`/turnos/editar/${t.id}`) Editar
+                        form(action=`/turnos/eliminar/${t.id}` method="POST" style="display:inline")
+                          button.btn.btn-danger.btn-sm.ms-2(type="submit" onclick="return confirm('¿Seguro que deseas eliminar este turno?')") Eliminar
+
+                      if t.estado === 'pendiente' && (session.rol === 'admin' || session.rol === 'recepcionista' || session.rol === 'medico')
+                        form(action=`/turnos/estado/${t.id}` method="POST" style="display:inline")
+                          input(type="hidden" name="estado" value="atendido")
+                          button.btn.btn-success.btn-sm.ms-2(type="submit") Atender
+                        form(action=`/turnos/estado/${t.id}` method="POST" style="display:inline")
+                          input(type="hidden" name="estado" value="cancelado")
+                          button.btn.btn-secondary.btn-sm.ms-2(type="submit") Cancelar
+
+                      if t.estado === 'atendido' && !t.tieneAdmisionActiva
+                        a.btn.btn-primary.btn-sm.ms-2(href=`/admisiones/nuevo_desde_turno/${t.id}`) Internar
+                      else if t.estado === 'internacion_pendiente'
+                        span.badge.bg-info.ms-2 Se mandó a internar
+              else
+                tr
+                  td.text-center(colspan="6") No se encontraron turnos registrados
+
+        //- Paginación
+        if totalPaginas && totalPaginas > 1
+          nav.mt-3(aria-label="Paginación de turnos")
+            ul.pagination
+              li.page-item(class=(pagina <= 1 ? 'disabled' : ''))
+                a.page-link(href=`/turnos?pagina=${pagina-1}&orden=${orden}&direccion=${direccion}&paciente=${busquedaPaciente || ''}&medico=${busquedaMedico || ''}&estado=${busquedaEstado || ''}`) Anterior
+
+              - const start = Math.max(1, pagina - 2);
+              - const end = Math.min(totalPaginas, pagina + 2);
+              each p in Array(end - start + 1).fill().map((_, i) => start + i)
+                li.page-item(class=(p === pagina ? 'active' : ''))
+                  a.page-link(href=`/turnos?pagina=${p}&orden=${orden}&direccion=${direccion}&paciente=${busquedaPaciente || ''}&medico=${busquedaMedico || ''}&estado=${busquedaEstado || ''}`)= p
+
+              li.page-item(class=(pagina >= totalPaginas ? 'disabled' : ''))
+                a.page-link(href=`/turnos?pagina=${pagina+1}&orden=${orden}&direccion=${direccion}&paciente=${busquedaPaciente || ''}&medico=${busquedaMedico || ''}&estado=${busquedaEstado || ''}`) Siguiente
+
+        if typeof count !== 'undefined'
+          p.text-muted.mt-2 Mostrando página #{pagina} de #{totalPaginas} — Total de turnos: #{count}.

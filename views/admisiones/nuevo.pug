@@ -6,43 +6,42 @@ block content
     h1.text-center Nueva Admisión
     .card.shadow
       .card-body
-        //- Mensaje de error si algo falla en el controlador
         if error
           .alert.alert-danger= error
 
-        //- Formulario principal para crear nueva admisión
         form(action="/admisiones/nuevo" method="POST")
           .row.g-3
-            //- Selección de Paciente (dropdown con todos los pacientes)
             .col-md-6
               label.form-label(for="paciente_id") Paciente:
               select.form-select(name="paciente_id" required)
                 option(value="") Seleccione un paciente...
                 each paciente in pacientes
-                  option(value=paciente.id)= `${paciente.nombre} ${paciente.apellido} (DNI: ${paciente.dni})`
+                  option(
+                    value=paciente.id 
+                    selected=(datos && datos.paciente_id == paciente.id)
+                  )= `${paciente.nombre} ${paciente.apellido} (DNI: ${paciente.dni} - Género: ${paciente.genero || 'N/A'})`
 
-            //- Selección de Cama Disponible (dropdown con camas y sala)
             .col-md-6
               label.form-label(for="cama_id") Cama:
               select.form-select(name="cama_id" required)
                 option(value="") Seleccione una cama...
                 each cama in camas
-                  option(value=cama.id)= `Cama ${cama.numero_cama} - Sala ${cama.Sala.numero_sala} (${cama.Sala.ala})`
+                  option(
+                    value=cama.id 
+                    selected=(datos && datos.cama_id == cama.id)
+                  )= `Cama ${cama.numero_cama} - Sala ${cama.Sala.numero_sala} (${cama.Sala.ala}) - Capacidad: ${cama.Sala.capacidad}`
 
-            //- Tipo de Admisión (Programada, Emergencia, Derivada)
             .col-md-6
               label.form-label(for="tipo_admision") Tipo de Admisión:
               select.form-select(name="tipo_admision" required)
-                option(value="Programada") Programada
-                option(value="Emergencia") Emergencia
-                option(value="Derivada") Derivada
+                option(value="Programada" selected=(datos && datos.tipo_admision === 'Programada')) Programada
+                option(value="Emergencia" selected=(datos && datos.tipo_admision === 'Emergencia')) Emergencia
+                option(value="Derivada" selected=(datos && datos.tipo_admision === 'Derivada')) Derivada
 
-            //- Motivo de la admisión (textarea obligatorio)
             .col-md-12
               label.form-label(for="motivo") Motivo:
-              textarea.form-control(name="motivo" rows="3" required)
+              textarea.form-control(name="motivo" rows="3" required)= (datos ? datos.motivo : '')
 
-          //- Botones de acción
           .mt-4
             button.btn.btn-success(type="submit") Guardar
             a.btn.btn-secondary.ms-2(href="/admisiones") Cancelar
